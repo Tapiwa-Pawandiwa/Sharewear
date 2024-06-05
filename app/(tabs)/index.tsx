@@ -1,31 +1,89 @@
-import { StyleSheet } from 'react-native';
-
-import EditScreenInfo from '@/components/EditScreenInfo';
-import { Text, View } from '@/components/Themed';
-
+import { StyleSheet, Image } from "react-native";
+import EditScreenInfo from "@/components/EditScreenInfo";
+import { Text, View } from "@/components/Themed";
+import Colors from "@/constants/Colors";
+import { SafeAreaView } from "react-native-safe-area-context";
+import RoundedButton from "@/components/RoundedButton";
 export default function TabOneScreen() {
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Tab One</Text>
-      <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
-      <EditScreenInfo path="app/(tabs)/index.tsx" />
-    </View>
+    <SafeAreaView style={styles.container}>
+      <Text style={styles.title}>
+        Welcome, <Text style={styles.name}>Olly</Text>
+      </Text>
+      <Image
+        source={require("../../assets/images/save-earth.png")}
+        style={styles.image}
+      />
+      <View style={styles.bubble}>
+        <View style={styles.innerbubble}>
+        <Text style={styles.bubbleSubtitle}>
+            Are you in need of something ?
+          </Text>
+          <Image
+            source={require("../../assets/images/birdbox.png")}
+            resizeMode="cover"
+            style={styles.birdbox}
+          />
+        </View>
+        <RoundedButton title="Create Request" onPress={() => {}} style={styles.homeButton}/>
+      </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
+    backgroundColor: "#fff",
+  },
+  bubble: {
+    backgroundColor: Colors.grey.background,
+    height: 170,
+    width: 350,
+    borderRadius: 35,
+    marginLeft: 20,
+    marginTop: 40,
+    padding: 15,
+  },
+  homeButton:{
+    backgroundColor: Colors.green.main,
+  },
+  innerbubble: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    backgroundColor: Colors.grey.background,
   },
   title: {
-    fontSize: 20,
-    fontWeight: 'bold',
+    fontSize: 30,
+    fontWeight: "bold",
+    marginTop: 30,
+    fontFamily: "LeagueSpartan-Bold",
+    marginLeft: 20,
+    textAlign: "center",
   },
-  separator: {
-    marginVertical: 30,
-    height: 1,
-    width: '80%',
+  name: {
+    color: Colors.green.main,
+  },
+  bubbleSubtitle: {
+    fontSize: 25,
+    width: 200,
+    marginLeft: 10,
+    marginTop: 15,
+    fontFamily: "LeagueSpartan-Regular",
+  },
+  image: {
+    width: 350,
+    height: 350,
+    justifyContent: "center",
+    alignSelf: "center",
+    marginTop: 50,
+  },
+  birdbox: {
+    width: 60,
+    height: 60,
+    justifyContent: "center",
+    alignSelf: "center",
+    marginRight: 25,
+    
   },
 });

@@ -1,0 +1,12 @@
+{
+  "resourceName": "s3sharewearstorage25fb766e",
+  "bucketName": "sharewear-storage-25fb766e",
+  "policyUUID": "8ea14fd3",
+  "storageAccess": "auth",
+  "guestAccess": [],
+  "authAccess": [
+    "CREATE_AND_UPDATE",
+    "READ",
+    "DELETE"
+  ]
+}

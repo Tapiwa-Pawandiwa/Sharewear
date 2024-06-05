@@ -24,6 +24,23 @@ SplashScreen.preventAutoHideAsync();
 export default function RootLayout() {
   const [loaded, error] = useFonts({
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
+    "Inter-Regular": require("../assets/fonts/Inter-Regular.ttf"),
+    "Inter-Medium": require("../assets/fonts/Inter-Medium.ttf"),
+    "Inter-SemiBold": require("../assets/fonts/Inter-SemiBold.ttf"),
+    "Inter-Bold": require("../assets/fonts/Inter-Bold.ttf"),
+    "Inter-ExtraBold": require("../assets/fonts/Inter-ExtraBold.ttf"),
+    "Inter-ExtraLight": require("../assets/fonts/Inter-ExtraLight.ttf"),
+    "Inter-Light": require("../assets/fonts/Inter-Light.ttf"),
+    "Now-Regular": require("../assets/fonts/Now-Regular.otf"),
+    "Now-Bold": require("../assets/fonts/Now-Bold.otf"),
+    "Now-Light": require("../assets/fonts/Now-Light.otf"),
+    "Now-Medium": require("../assets/fonts/Now-Medium.otf"),
+    "Now-Black": require("../assets/fonts/Now-Black.otf"),
+    "SFPro-Regular": require("../assets/fonts/SFPro-Regular.ttf"),
+    "LeagueSpartan-Bold": require("../assets/fonts/LeagueSpartan-Bold.ttf"),
+    "LeagueSpartan-Regular": require("../assets/fonts/LeagueSpartan-Regular.ttf"),
+    "LeagueSpartan-Light": require("../assets/fonts/LeagueSpartan-Light.ttf"),
+    "LeagueSpartan-Thin": require("../assets/fonts/LeagueSpartan-Thin.ttf"),
     ...FontAwesome.font,
   });
 
@@ -47,7 +64,6 @@ export default function RootLayout() {
 
 function RootLayoutNav() {
   const colorScheme = useColorScheme();
-
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <Stack>
