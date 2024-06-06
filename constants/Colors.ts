@@ -25,7 +25,8 @@ export default {
     light:'#B0B3AF',
     dark: '#414540',
     background: '#F2F2F2',
-    alt: '#F2F2F2'
+    alt: '#F2F2F2',
+    card: '#F2F4F0'
   },
   beige:{
     main: '#DBD4B9',

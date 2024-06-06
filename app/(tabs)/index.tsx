@@ -25,7 +25,7 @@ export default function TabOneScreen() {
             style={styles.birdbox}
           />
         </View>
-        <RoundedButton title="Create Request" onPress={() => {}} style={styles.homeButton}/>
+        <RoundedButton title="Create Request" onPress={() => {}} buttonStyle={styles.homeButton} textStyle={styles.buttonText}/>
       </View>
     </SafeAreaView>
   );
@@ -38,20 +38,24 @@ const styles = StyleSheet.create({
   },
   bubble: {
     backgroundColor: Colors.grey.background,
-    height: 170,
+    height: 155,
     width: 350,
+
     borderRadius: 35,
     marginLeft: 20,
     marginTop: 40,
-    padding: 15,
+    padding: 10,
   },
   homeButton:{
     backgroundColor: Colors.green.main,
+    marginLeft: 15,
+  
   },
   innerbubble: {
     flexDirection: "row",
     justifyContent: "space-between",
     backgroundColor: Colors.grey.background,
+    marginLeft: 10,
   },
   title: {
     fontSize: 30,
@@ -83,7 +87,12 @@ const styles = StyleSheet.create({
     height: 60,
     justifyContent: "center",
     alignSelf: "center",
-    marginRight: 25,
-    
+    marginRight: 25, 
+    marginTop: 5,
   },
+  buttonText: {
+    color: 'white',
+
+  },
+
 });

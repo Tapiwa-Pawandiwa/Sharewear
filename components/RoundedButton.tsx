@@ -1,17 +1,18 @@
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native'
+import { View, Text, TouchableOpacity, StyleSheet , ViewStyle, TextStyle} from 'react-native'
 import React from 'react';
 import Colors from '@/constants/Colors';
 
 type RoundedButtonProps = {
     title: string;
     onPress: () => void;
-    style: object;
-};
+    buttonStyle?: ViewStyle;
+    textStyle?: TextStyle;
+  };
 
-const RoundedButton: React.FC<RoundedButtonProps> = ({title,onPress,style}) => {
+const RoundedButton: React.FC<RoundedButtonProps> = ({title,onPress,buttonStyle, textStyle}) => {
   return (
-    <TouchableOpacity style={[styles.button,style]}>
-      <Text style={styles.buttonText}>{title}</Text>
+    <TouchableOpacity style={[styles.button,buttonStyle]}>
+      <Text style={[styles.buttonText, textStyle]}>{title}</Text>
     </TouchableOpacity>
   )
 }
@@ -27,7 +28,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     buttonText: {
-        color: 'white',
+        color: 'black',
         fontSize: 18,
         textAlign: 'center',
     },
