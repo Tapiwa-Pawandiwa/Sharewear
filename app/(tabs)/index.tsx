@@ -4,7 +4,10 @@ import { Text, View } from "@/components/Themed";
 import Colors from "@/constants/Colors";
 import { SafeAreaView } from "react-native-safe-area-context";
 import RoundedButton from "@/components/RoundedButton";
+import { Link, useRouter } from "expo-router";
 export default function TabOneScreen() {
+  const router = useRouter();
+ 
   return (
     <SafeAreaView style={styles.container}>
       <Text style={styles.title}>
@@ -25,7 +28,7 @@ export default function TabOneScreen() {
             style={styles.birdbox}
           />
         </View>
-        <RoundedButton title="Create Request" onPress={() => {}} buttonStyle={styles.homeButton} textStyle={styles.buttonText}/>
+        <RoundedButton link="/createRequest/RequestStepOne" title="Create Request"  buttonStyle={styles.homeButton} textStyle={styles.buttonText}/>
       </View>
     </SafeAreaView>
   );

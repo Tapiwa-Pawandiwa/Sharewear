@@ -4,9 +4,6 @@ import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
-import RequestFormOne from './screens/requestForm/requestFormOne';
-import RequestFormTwo from './screens/requestForm/requestFormTwo';
-import RequestFormThree from './screens/requestForm/requestFormThree';
 import 'react-native-reanimated';
 
 import { useColorScheme } from '@/components/useColorScheme';
@@ -72,7 +69,10 @@ function RootLayoutNav() {
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <Stack>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="RequestFormOne" options={{ headerShown: false }}/>     
+        <Stack.Screen name="createRequest/RequestStepOne" options={{ headerShown: false }} />
+        <Stack.Screen name="createRequest/RequestStepTwo" options={{ headerShown: false }} />
+        <Stack.Screen name="createRequest/RequestStepThree" options={{ headerShown: false }} />
+
       </Stack>
     </ThemeProvider>
   );
