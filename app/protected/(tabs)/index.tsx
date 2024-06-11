@@ -14,7 +14,7 @@ export default function TabOneScreen() {
         Welcome, <Text style={styles.name}>Olly</Text>
       </Text>
       <Image
-        source={require("../../assets/images/save-earth.png")}
+        source={require("../../../assets/images/save-earth.png")}
         style={styles.image}
       />
       <View style={styles.bubble}>
@@ -23,7 +23,7 @@ export default function TabOneScreen() {
             Are you in need of something ?
           </Text>
           <Image
-            source={require("../../assets/images/birdbox.png")}
+            source={require("../../../assets/images/birdbox.png")}
             resizeMode="cover"
             style={styles.birdbox}
           />

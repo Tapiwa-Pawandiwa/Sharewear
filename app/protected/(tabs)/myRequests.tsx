@@ -15,9 +15,9 @@ interface DataItem {
 }
 
 const data:DataItem[] = [
-  {id: '1',description : 'Help me with my groceries', location: 'Prenzlauer-Berg', items: 5, from: 'Olly', image: require('../../assets/images/foodboxes.jpg'), time: '23:00:10'},
-  {id: '2',description : 'Help me with my wheelchair', location: 'Prenzlauer-Berg', items: 3, from: 'David', image: require('../../assets/images/wheelchair.jpg'), time: '23:00:10'},
-  {id: '3',description : 'Help me with baby supplies', location: 'Prenzlauer-Berg', items: 3, from: 'Jessica', image: require('../../assets/images/babyImage.jpg'), time: '23:00:10'},
+  {id: '1',description : 'Help me with my groceries', location: 'Prenzlauer-Berg', items: 5, from: 'Olly', image: require('../../../assets/images/foodboxes.jpg'), time: '23:00:10'},
+  {id: '2',description : 'Help me with my wheelchair', location: 'Prenzlauer-Berg', items: 3, from: 'David', image: require('../../../assets/images/wheelchair.jpg'), time: '23:00:10'},
+  {id: '3',description : 'Help me with baby supplies', location: 'Prenzlauer-Berg', items: 3, from: 'Jessica', image: require('../../../assets/images/babyImage.jpg'), time: '23:00:10'},
 ];
 
 export default function TabTwoScreen() {
@@ -34,7 +34,7 @@ export default function TabTwoScreen() {
     <View style={styles.container}>
       <View style={styles.headerContainer}>
       <View style={styles.innerContainer}>
-        <Image source={require('../../assets/images/birdbox.png')} style={styles.image} />
+        <Image source={require('../../../assets/images/birdbox.png')} style={styles.image} />
          <Text style={styles.title}>My Requests</Text>
       </View>
       <ToggleSwitch initialState={false} onToggle={handleToggle} style={styles.toggleSwitch}/>

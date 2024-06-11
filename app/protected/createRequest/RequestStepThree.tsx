@@ -12,7 +12,7 @@ const RequestStepThree:React.FC = () => {
   const uploadIcon = <Feather name="upload" size={18} color="black" />;
   return (
     <View style={styles.container}>
-    <Image style={styles.headBox} source={require("../../assets/images/birdbox.png")}/>
+    <Image style={styles.headBox} source={require("../../../assets/images/birdbox.png")}/>
       <Text style={styles.header}>Request Form </Text>
     <StepCounter currentStep={3} totalSteps={3}/>
 

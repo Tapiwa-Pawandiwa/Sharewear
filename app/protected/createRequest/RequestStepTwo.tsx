@@ -13,7 +13,7 @@ const RequestStepTwo:React.FC = () => {
 
   return (
     <View style={styles.container}>
-      <Image style={styles.headBox} source={require("../../assets/images/birdbox.png")}/>
+      <Image style={styles.headBox} source={require("../../../assets/images/birdbox.png")}/>
         <Text style={styles.header}>Request Form </Text>
       <StepCounter currentStep={2} totalSteps={3}/>
       <ItemAdder/>

@@ -5,7 +5,9 @@ import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 import 'react-native-reanimated';
-
+import config from './aws-exports';
+import { Amplify } from 'aws-amplify';
+Amplify.configure(config);
 import { useColorScheme } from '@/components/useColorScheme';
 
 export {
@@ -15,13 +17,13 @@ export {
 
 export const unstable_settings = {
   // Ensure that reloading on `/modal` keeps a back button present.
-  initialRouteName: '(tabs)',
+  initialRouteName: 'onboarding',
 };
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
-export default function RootLayout() {
+ function RootLayout() {
   const [loaded, error] = useFonts({
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
     "Inter-Regular": require("../assets/fonts/Inter-Regular.ttf"),
@@ -68,12 +70,12 @@ function RootLayoutNav() {
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="createRequest/RequestStepOne" options={{ headerShown: false }} />
-        <Stack.Screen name="createRequest/RequestStepTwo" options={{ headerShown: false }} />
-        <Stack.Screen name="createRequest/RequestStepThree" options={{ headerShown: false }} />
-
+        <Stack.Screen name="onboarding" options={{ headerShown: false }} />
       </Stack>
     </ThemeProvider>
+ 
   );
 }
+
+
+export default RootLayout;
