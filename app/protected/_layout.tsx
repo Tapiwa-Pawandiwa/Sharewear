@@ -1,5 +1,4 @@
 import { Slot } from "expo-router";
-import {withAuthenticator} from '@aws-amplify/ui-react-native';
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import {Stack} from "expo-router";
 import React from "react";
@@ -19,4 +18,4 @@ import { useColorScheme } from '@/components/useColorScheme';
     );
 }
 
-export default withAuthenticator(ProtectedLayout);
+export default ProtectedLayout;

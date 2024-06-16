@@ -17,6 +17,9 @@
       },
       "storage": {
         "s3sharewearstorage25fb766e": {}
+      },
+      "api": {
+        "ShareWear": {}
       }
     }
   }

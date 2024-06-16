@@ -3,7 +3,7 @@
   "cognitoConfig": {
     "identityPoolName": "testAuthIdentityPool",
     "allowUnauthenticatedIdentities": false,
-    "resourceNameTruncated": "sharewdf4a5cf5",
+    "resourceNameTruncated": "sharewf1c94dda",
     "userPoolName": "ShareWear",
     "autoVerifiedAttributes": [
       "email"
@@ -34,9 +34,9 @@
     "userpoolClientRefreshTokenValidity": 30,
     "userpoolClientWriteAttributes": [],
     "userpoolClientReadAttributes": [],
-    "userpoolClientLambdaRole": "ShareWdf4a5cf5_userpoolclient_lambda_role",
+    "userpoolClientLambdaRole": "ShareWf1c94dda_userpoolclient_lambda_role",
     "userpoolClientSetAttributes": false,
-    "sharedId": "df4a5cf5",
+    "sharedId": "f1c94dda",
     "resourceName": "ShareWear",
     "authSelections": "identityPoolAndUserPool",
     "serviceName": "Cognito",

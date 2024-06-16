@@ -1,3 +1,9 @@
+enum Type {
+  ORGANISATION
+  PERSONAL
+  BUSINESS
+}
+
 enum Status {
   AVAILABLE
   EXPIRED
@@ -55,7 +61,7 @@ type Beneficiary @model @auth(rules: [{allow: public}]) {
   firstName: String!
   lastName: String!
   email: AWSEmail!
-  type: String!
+  type: Type!
   Donations: [Donation] @hasMany(indexName: "byBeneficiary", fields: ["id"])
   DonationRequests: [DonationRequest] @hasMany(indexName: "byBeneficiary", fields: ["id"])
   Items: [Item] @hasMany(indexName: "byBeneficiary", fields: ["id"])
@@ -71,4 +77,7 @@ type DonationRequest @model @auth(rules: [{allow: public}]) {
   beneficiaryID: ID! @index(name: "byBeneficiary")
   createdAt: AWSDateTime!
   updatedAt: AWSDateTime
+  lng: Float
+  lat: Float
 }
+ 

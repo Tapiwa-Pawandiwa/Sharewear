@@ -69,7 +69,7 @@ const slides = [
 const Onboarding = () => {
 
   const handleDone = () => {
-    router.navigate('/protected')
+    router.navigate('/auth/sign-in')
   }
   return (
     <AppIntroSlider
