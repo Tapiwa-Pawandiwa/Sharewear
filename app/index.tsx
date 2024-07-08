@@ -3,9 +3,12 @@ import React from 'react'
 import AppIntroSlider from 'react-native-app-intro-slider';
 import Link from '@react-navigation/native';
 import { router } from 'expo-router'; 
-
+import { useEffect } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import Colors from '@/constants/Colors';
 import { useNavigation } from '@react-navigation/native';
+import { useAuth } from './providers/Auth';
+
 
 /*
     Onboarding Screen
@@ -67,9 +70,29 @@ const slides = [
   
 
 const Onboarding = () => {
+const {session, profile, loading,isAdmin} = useAuth();
 
-  const handleDone = () => {
-    router.navigate('/auth/sign-in')
+  useEffect(() => {
+    const checkOnboardingStatus = async () => {
+      const hasSeenOnboarding = await AsyncStorage.getItem('hasSeenOnboarding');
+      if (hasSeenOnboarding) {
+        if (session) {
+          if (isAdmin) {
+            router.navigate('/(admin)');
+          } else {
+            router.navigate('/(user)');
+          }
+        } else {
+          router.navigate('/(auth)');
+        }
+      }
+    };
+    checkOnboardingStatus();
+  }, [session, isAdmin]);
+
+  const handleDone = async () => {
+    await AsyncStorage.setItem('hasSeenOnboarding', 'true');
+    router.navigate('/(auth)')
   }
   return (
     <AppIntroSlider

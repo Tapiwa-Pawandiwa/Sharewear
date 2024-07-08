@@ -5,10 +5,8 @@ import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 import 'react-native-reanimated';
-import config from './aws-exports';
-import { Amplify } from 'aws-amplify';
-Amplify.configure(config);
 import { useColorScheme } from '@/components/useColorScheme';
+import AuthProvider from './providers/Auth';
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -63,17 +61,23 @@ SplashScreen.preventAutoHideAsync();
 
   return <RootLayoutNav />;
 }
+/*
+<Stack.Screen name="index" options={{ headerShown: false }} />
 
+*/
 function RootLayoutNav() {
   const colorScheme = useColorScheme();
-  
+
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
+     <AuthProvider>
+        <Stack>
         <Stack.Screen name="index" options={{ headerShown: false }} />
-        <Stack.Screen name="auth/sign-in" options={{ headerShown: false }} />
-        <Stack.Screen name="auth/sign-up" options={{ headerShown: false }} />
+        <Stack.Screen name="(admin)" options={{ headerShown: false }} />
+        <Stack.Screen name="(user)" options={{ headerShown: false }} />
+        <Stack.Screen name="(auth)" options={{ headerShown: false }} />
       </Stack>
+     </AuthProvider>
     </ThemeProvider>
  
   );

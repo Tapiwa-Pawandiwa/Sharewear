@@ -61,7 +61,6 @@ type Beneficiary @model @auth(rules: [{allow: public}]) {
   firstName: String!
   lastName: String!
   email: AWSEmail!
-  type: Type!
   Donations: [Donation] @hasMany(indexName: "byBeneficiary", fields: ["id"])
   DonationRequests: [DonationRequest] @hasMany(indexName: "byBeneficiary", fields: ["id"])
   Items: [Item] @hasMany(indexName: "byBeneficiary", fields: ["id"])
@@ -79,5 +78,7 @@ type DonationRequest @model @auth(rules: [{allow: public}]) {
   updatedAt: AWSDateTime
   lng: Float
   lat: Float
+  usage: Type!
+  status: Status!
 }
  
