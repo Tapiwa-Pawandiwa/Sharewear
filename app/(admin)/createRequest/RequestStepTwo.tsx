@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { View, Text, StyleSheet, Image } from 'react-native';
 import RoundedButton from '@/components/RoundedButton';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -7,10 +7,16 @@ import StepCounter from '@/components/StepCounter';
 import { AntDesign } from '@expo/vector-icons';
 import Colors from '@/constants/Colors';
 import ItemAdder from '@/components/ItemAdder';
+import { useFormContext } from '@/app/providers/Form';
 const RequestStepTwo:React.FC = () => {
   const router = useRouter();
-  const arrowIcon = <AntDesign name="arrowright" size={24} color="white" />;
+  const { formData, updateFormData } = useFormContext();
 
+  const arrowIcon = <AntDesign name="arrowright" size={24} color="white" />;
+useEffect(() => {
+  console.log(formData, 'formData Step 2')
+  }
+  ,[])
   return (
     <View style={styles.container}>
       <Image style={styles.headBox} source={require("../../../assets/images/birdbox.png")}/>

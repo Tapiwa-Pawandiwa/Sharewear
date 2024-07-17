@@ -9,40 +9,45 @@ import {
 } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
 import Colors from "@/constants/Colors";
-import RoundedButton from "./RoundedButton";
-
-const initialData = [
-  {
-    id: 1,
-    name: "Diaper",
-    quantity: 1,
-  },
-  {
-    id: 2,
-    name: "Wipes",
-    quantity: 1,
-  },
-  {
-    id: 3,
-    name: "Formula",
-    quantity: 1,
-  },
-  {
-    id: 4,
-    name: "Baby Food",
-    quantity: 2,
-  },
-  {
-    id: 5,
-    name: "Baby Clothes",
-    quantity: 1,
-  },
-];
+import RoundedButton from "./RoundedButton"; 
+import { useFormContext } from "@/app/providers/Form";
+import { black } from "react-native-paper/lib/typescript/styles/themes/v2/colors";
+import { supabase } from "@/lib/supabase";
+import {SelectList} from 'react-native-dropdown-select-list'
 
 const ItemAdder: React.FC = () => {
-  const [text, onChangeText] = useState("Diaper");
+  const [text, onChangeText] = useState("");
   const [quantity, setQuantity] = useState(1);
-  const [data, setData] = useState(initialData);
+  const [data, setData] = useState([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
+  const { formData, updateFormData, removeItem, addItem } = useFormContext();
+
+  interface Category {
+    id: string;
+    name: string;
+  }
+  
+
+useEffect(() => {
+  console.log(formData, 'formData added item')
+  const fetchCategories = async () => {
+    try {
+      const { data, error } = await supabase.from('category').select('*');
+      if (error) {
+        throw error;
+      }
+      if (data) {
+        setCategories(data);
+      }
+    } catch (error) {
+      console.error('Error fetching categories:', error);
+    }
+  };
+  fetchCategories();
+}
+  ,[])
+
 
   const onMinus = () => {
     if (quantity > 1) {
@@ -53,17 +58,21 @@ const ItemAdder: React.FC = () => {
   const onPlus = () => {
     setQuantity(quantity + 1);
   };
-  const addItem = () => {
+
+  const handleAddItem = () => {
     if (text.trim() !== "") {
-      const newItem = { id: Date.now(), name: text, quantity };
-      setData([...data, newItem]);
-      onChangeText("");
+      const newItem = { id: Date.now(), name: text, quantity, category_ID: selectedCategory?.id  };
+      addItem(newItem);
+      console.log(formData.items, 'formData added item')
+      console.log(selectedCategory, 'selectedCategory')
+      console.log(formData,'form data' )
       setQuantity(1);
     }
+  
   };
 
-  const deleteItem = (id: number) => {
-    setData(data.filter((item) => item.id !== id));
+  const handleDeleteItem = (id: number) => {
+    removeItem(id);
   };
 
   return (
@@ -73,6 +82,7 @@ const ItemAdder: React.FC = () => {
         style={styles.input}
         onChangeText={onChangeText}
         value={text}
+        placeholder="Something you need..."
       />
 
       <View style={styles.countContainer}>
@@ -90,21 +100,35 @@ const ItemAdder: React.FC = () => {
           onPress={onPlus}
         />
       </View>
+      <SelectList
+      setSelected={(val: string) => {
+      const selected = categories.find((category) => category.id === val);
+      if (selected) {
+        setSelectedCategory(selected);
+        }
+  }}        data={categories.map((category) => ({
+          key: category.id,
+          value: category.name,
+        }))}       
+         placeholder="Select Category"
+        boxStyles={{marginTop: 10}}
+      
+      />
       <RoundedButton
         title="Add Item"
-        onPress={addItem}
+        onPress={handleAddItem}
         buttonStyle={styles.addButton}
         textStyle={styles.buttonText}
       />
       <FlatList
-        data={data}
+        data={formData.items}
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
           <View style={styles.summaryContainer}>
             <Text style={styles.summaryText}>
               {item.name}: {item.quantity}
             </Text>
-            <TouchableOpacity onPress={() => deleteItem(item.id)}>
+            <TouchableOpacity onPress={() => handleDeleteItem(item.id)}>
               <AntDesign name="closecircleo" size={20} color={"red"} />
             </TouchableOpacity>
           </View>
@@ -160,7 +184,7 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     width: 220,
     alignSelf: "center",
-    color: Colors.grey.dark,
+    color: "black",
   },
   symbolContainer: {
     borderRadius: 30,

@@ -1,46 +1,54 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { SafeAreaView, StyleSheet, Text, View ,Pressable,FlatList} from 'react-native';
 import Chip from './Chip';
+import { supabase } from '@/lib/supabase';
+import { useFormContext } from '@/app/providers/Form';
 
 const TagSelector: React.FC = () => {
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
-  const [availableTags, setAvailableTags] = useState<string[]>([
-    'Disability',
-    'Refugee',
-    'Family',
-    'Homeless',
-    'Mental Health',
-    'School',
-    'Children',
-    'Elderly',
-    'Health',
-    'Food',
-    'Single Parent',
-    'LGBTQ+',
-    'Charity',
-    'Women',
-  ]);
+  const {formData, addTag, removeTag}= useFormContext();
+  
+  const [availableTags, setAvailableTags] = useState<{ id: number, name: string }[] | null>(null);
 
-  const handleSelectTag = (tag: string) => {
-    setSelectedTags((prevSelectedTags) =>
-      prevSelectedTags.includes(tag)
-        ? prevSelectedTags.filter((t) => t !== tag)
-        : [...prevSelectedTags, tag]
-    );
+  useEffect(() => {
+    const fetchTags = async () => {
+      let { data: tags, error } = await supabase
+      .from('tags')
+     .select('*')
+      
+     if (error) {
+       console.log('Error fetching tags', error.message);
+       return;
+     }else {
+        setAvailableTags(tags);
+     }
+    };
+   
+
+    fetchTags();
+  }, []);
+
+  const handleSelectTag = (tag: { id: number, name: string }) => {
+    if (formData.tags.find(t => t.id === tag.id)) {
+      removeTag(tag.id);
+    } else {
+      addTag(tag);
+    }
   };
+
 
 return (
     <FlatList
         data={availableTags}
-        keyExtractor={(item) => item}
+        keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
           <Chip
-            tag={item}
-            isSelected={selectedTags.includes(item)}
-            onPress={handleSelectTag}
+            tag={item.name}
+            isSelected={!!formData.tags.find(t => t.id === item.id)} // Convert to boolean
+            onPress={() => handleSelectTag(item)}
           />
         )}
-        numColumns={3} // Customize this value for random layout effect
+        numColumns={4} // Customize this value for random layout effect
         columnWrapperStyle={styles.column}
         contentContainerStyle={styles.tagContainer}
       />
@@ -50,21 +58,18 @@ return (
 export default TagSelector;
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 20,
-  },
   title: {
     fontSize: 24,
     marginBottom: 10,
   },
   column: {
-    justifyContent: 'flex-start',
+    justifyContent:'center',
+   paddingHorizontal: 5,
   },
   tagContainer: {
-    flexDirection: 'column',
-    justifyContent: 'center',
-    alignItems: 'center',
+    padding: 15,
+    alignSelf: 'center',
+    width: 200,
   },
   chip: {
     margin: 4,

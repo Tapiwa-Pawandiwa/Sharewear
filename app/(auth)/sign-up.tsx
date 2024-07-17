@@ -8,6 +8,7 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import CustomRadioButton from "@/components/CustomRadioButton";
 import { RadioButton } from "react-native-paper";
 import { supabase } from "@/lib/supabase";
+import { useAuth } from "../providers/Auth";
 
 
 const signUpScreen = () => {
@@ -17,6 +18,7 @@ const signUpScreen = () => {
   const [lastName, setLastName] = useState(""); // [value, setValue
   const [userType, setUserType] = useState("Donor");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const {isAdmin} = useAuth();
   //const [userType, setUserTypeState] = useState<RootState['user']['userType']>('Donor');
  // const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -54,6 +56,7 @@ const signUpScreen = () => {
               first_name: firstName,
               last_name: lastName,
               user_type: userType,
+              username: email,
             }
           }
         }
@@ -68,7 +71,12 @@ const signUpScreen = () => {
         password: password,
       });
       console.log(newData, 'newData');
-      router.navigate("/(user)");      
+      
+      if (newData.user?.user_metadata.user_type === "Beneficiary"){
+        router.push("/(admin)");
+      }else {
+        router.push("/(user)");
+      }
    
     } catch (e: any) {
       console.log("Sign up failed", e);

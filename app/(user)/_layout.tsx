@@ -10,7 +10,7 @@ import { useColorScheme } from '@/components/useColorScheme';
     const colorScheme = useColorScheme();
     const {session, profile, isAdmin,loading} = useAuth();
     if (!session) {
-        return <Redirect href="/(auth)/sign-in" />
+        return <Redirect href="/(auth)" />
     }
     if (isAdmin) {
         return <Redirect href="/(admin)" />

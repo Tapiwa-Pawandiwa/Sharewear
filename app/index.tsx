@@ -83,7 +83,7 @@ const {session, profile, loading,isAdmin} = useAuth();
             router.navigate('/(user)');
           }
         } else {
-          router.navigate('/(auth)');
+          router.navigate('/(auth)/sign-in');
         }
       }
     };
@@ -92,7 +92,7 @@ const {session, profile, loading,isAdmin} = useAuth();
 
   const handleDone = async () => {
     await AsyncStorage.setItem('hasSeenOnboarding', 'true');
-    router.navigate('/(auth)')
+    router.navigate('/(auth)/sign-in')
   }
   return (
     <AppIntroSlider

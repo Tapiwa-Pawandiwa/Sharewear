@@ -5,13 +5,18 @@ import Colors from "@/constants/Colors";
 import { SafeAreaView } from "react-native-safe-area-context";
 import RoundedButton from "@/components/RoundedButton";
 import { Link, useRouter } from "expo-router";
+import { useAuth } from "@/app/providers/Auth";
+import { useFormContext } from "@/app/providers/Form";
+
 export default function TabOneScreen() {
   const router = useRouter();
+  const {profile,isAdmin,loading} = useAuth();
+  const {clearFormData}= useFormContext();
  
   return (
     <SafeAreaView style={styles.container}>
       <Text style={styles.title}>
-        Welcome, <Text style={styles.name}>Olly</Text>
+        Welcome, <Text style={styles.name}>{profile?.first_name}</Text>
       </Text>
       <Image
         source={require("../../../assets/images/save-earth.png")}
@@ -28,7 +33,7 @@ export default function TabOneScreen() {
             style={styles.birdbox}
           />
         </View>
-        <RoundedButton link="/createRequest/RequestStepOne" title="Create Request"  buttonStyle={styles.homeButton} textStyle={styles.buttonText}/>
+        <RoundedButton link="/createRequest/RequestStepOne" onPress={ clearFormData} title="Create Request"  buttonStyle={styles.homeButton} textStyle={styles.buttonText}/>
       </View>
     </SafeAreaView>
   );

@@ -1,15 +1,54 @@
-import React,{useState} from 'react';
-import { View, Text, StyleSheet, Image,TextInput } from 'react-native';
+import React,{useEffect, useState} from 'react';
+import { View, Text, StyleSheet, Image,TextInput,FlatList } from 'react-native';
 import RoundedButton from '@/components/RoundedButton';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import StepCounter from '@/components/StepCounter';
 import Colors from '@/constants/Colors';
-import { Feather } from '@expo/vector-icons';
-
+import { AntDesign, Feather } from '@expo/vector-icons';
+import * as ImagePicker from 'expo-image-picker'
+import { useFormContext } from '@/app/providers/Form';
+import { TouchableOpacity } from 'react-native';
 const RequestStepThree:React.FC = () => {
-  const [text, onChangeText] = useState("I am in need of...because...");
+  const [text, onChangeText] = useState("");
   const [images, setImages] = useState([] as string[]);
+  const [localImages, setLocalImages]= useState<string[]>([]);
+  const { formData, updateFormData,postFormData } = useFormContext();
   const uploadIcon = <Feather name="upload" size={18} color="black" />;
+  
+
+
+  useEffect(() => {
+    console.log(formData, 'formData Step 3')
+  }
+    ,[])
+
+
+
+  const pickImage = async()=>{
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsMultipleSelection: true, 
+      quality: 1,
+    })
+
+    if (!result.canceled) {
+      const newImages = result.assets.map((asset) => asset.uri);
+      setLocalImages([...localImages, ...newImages]);
+      updateFormData('images', [...formData.images, ...newImages]); // Update form data images array
+    }
+  };
+
+  const handleDeleteImage = (index: number) => {
+    const updatedImages = [...localImages];
+    updatedImages.splice(index, 1);
+    setLocalImages(updatedImages);
+    const updatedFormDataImages = [...formData.images];
+    updatedFormDataImages.splice(index, 1);
+    updateFormData('images', updatedFormDataImages); // Update form data images array
+  };
+  
+  
+  
   return (
     <View style={styles.container}>
     <Image style={styles.headBox} source={require("../../../assets/images/birdbox.png")}/>
@@ -22,22 +61,39 @@ const RequestStepThree:React.FC = () => {
   </View>
   <TextInput
         style={styles.input}
-        onChangeText={onChangeText}
+        onChangeText={(text) => {
+          onChangeText(text);
+          updateFormData('description', text); // Update form data as user types
+      }}
         value={text}
         multiline={true}
         textAlignVertical='top'
         selectionColor={Colors.green.alt}
+        placeholder='Add a description...I am in need of...because...'
       />
         <Text style={styles.instructionText}> Upload at least one Image</Text> 
 <View>
-<RoundedButton title="Upload Image" icon={uploadIcon} iconStyle={styles.iconStyle}   buttonStyle={styles.uploadButton} textStyle={styles.uploadText}/>
+<RoundedButton title="Upload Image" icon={uploadIcon} onPress={pickImage} iconStyle={styles.iconStyle}   buttonStyle={styles.uploadButton} textStyle={styles.uploadText}/>
 </View>
 <View style={styles.imageSummaryContainer}>
-    
+<FlatList
+          data={localImages}
+          keyExtractor={(item, index) => index.toString()}
+          renderItem={({ item, index }) => (
+            <View style={styles.summaryItem}>
+              <Image source={{ uri: item }} style={styles.image} />
+              <TouchableOpacity onPress={() => handleDeleteImage(index)}>
+                <AntDesign name="close" size={20} color="red" style={styles.deleteIcon} />
+              </TouchableOpacity>
+            </View>
+          )}
+          horizontal
+          showsHorizontalScrollIndicator={false}
+        />
 </View>
 <View style={styles.buttonBox}>
-    <RoundedButton title="Preview"   buttonStyle={styles.previewButton} textStyle={styles.previewText}/>
-    <RoundedButton title="Publish"   buttonStyle={styles.publishButton} textStyle={styles.publishText}/>
+    <RoundedButton title="Preview"  buttonStyle={styles.previewButton} textStyle={styles.previewText}/>
+    <RoundedButton title="Publish" onPress={postFormData}  buttonStyle={styles.publishButton} textStyle={styles.publishText}/>
 </View>
   </View>
 )
@@ -73,6 +129,17 @@ const styles = StyleSheet.create({
     marginBottom: 5,
     marginTop: 20,
     alignSelf: "center",
+  },
+  summaryItem: {
+    marginRight: 10,
+    flexDirection: 'row',
+    padding: 10,
+  },
+  image: {
+    width: 50,
+    height: 50,
+    borderRadius: 10,
+    marginBottom: 5,
   },
   subtitleText:{
     fontSize: 16,
@@ -114,6 +181,11 @@ const styles = StyleSheet.create({
     alignContent: 'center',
     alignSelf: 'center',
     marginRight: 15,  
+  },
+  deleteIcon: {
+    position: 'absolute',
+    top: 5,
+    right: 5,
   },
   publishButton: {
     width: 100,

@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { View, Text, StyleSheet, Image, Pressable } from "react-native";
+import React, { useState,useEffect } from "react";
+import { View, Text, StyleSheet, Image, Pressable , FlatList, KeyboardAvoidingView, Platform} from "react-native";
 import RoundedButton from "@/components/RoundedButton";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
@@ -9,29 +9,79 @@ import Colors from "@/constants/Colors";
 import { AntDesign } from '@expo/vector-icons';
 import TagSelector from "@/components/TagSelectors";
 import { TextInput } from "react-native";
+import { useFormContext } from "@/app/providers/Form";
+import CustomRadioButton from "@/components/CustomRadioButton";
 
 
 const RequestStepOne: React.FC = () => {
   const router = useRouter();
-  const arrowIcon = <AntDesign name="arrowright" size={24} color="white" />;
-  const [text, onChangeText]=  useState('Help me with...');
-  return (
-    <SafeAreaView>
-      <Image style={styles.headBox} source={require("../../../assets/images/birdbox.png")}/>
-        <Text style={styles.header}>Request Form </Text>
-      <StepCounter currentStep={1} totalSteps={3}/>
-       <Text style={styles.heading}>What is your request Headline ?</Text>
-       <TextInput
-        style={styles.input}
-        onChangeText={onChangeText}
-        value={text}
-      />
+  const { formData, updateFormData, clearFormData } = useFormContext();
 
-       <Text style={styles.heading}> Select Tags associated with your situation </Text>
+  const arrowIcon = <AntDesign name="arrowright" size={24} color="white" />;
+  const [headline, onChangeHeadline] = useState(formData.headline || '');
+  const [city, onChangeCity] = useState(formData.city || '');
+  const [suburb, onChangeSuburb] = useState(formData.suburb || '');
   
-       <TagSelector/>
-   
-      <RoundedButton title="Next" link="/createRequest/RequestStepTwo" icon={arrowIcon} buttonStyle={styles.nextButton} textStyle={styles.nextText}/>
+
+  useEffect(() => {
+    clearFormData();
+    console.log(formData, 'formData Step 1')
+  }
+    ,[])
+  
+  useEffect(() => {
+ 
+    updateFormData('headline', headline);
+    updateFormData('city', city);
+    updateFormData('suburb', suburb);
+  }, [headline,city,suburb]);
+  const renderContent = () => {
+    return (
+      <View>
+        <Image style={styles.headBox} source={require("../../../assets/images/birdbox.png")} />
+        <Text style={styles.header}>Request Form</Text>
+        <StepCounter currentStep={1} totalSteps={3} />
+
+        <Text style={styles.heading}>What is your request Headline?</Text>
+        <TextInput
+          style={styles.input}
+          onChangeText={onChangeHeadline}
+          value={formData.headline}
+          placeholder="Help me with.."
+        />
+        <Text style={styles.heading}>City</Text>
+        <TextInput
+          style={styles.input}
+          onChangeText={onChangeCity}
+          value={formData.city}
+        />
+        <Text style={styles.heading}>Suburb</Text>
+        <TextInput
+          style={styles.input}
+          onChangeText={onChangeSuburb}
+          value={formData.suburb}
+        />
+        <Text style={styles.heading}>Select Tags associated with your situation</Text>
+<View style={styles.tagBox}>
+          <TagSelector />
+        </View>
+ 
+
+        <RoundedButton title="Next" link="/createRequest/RequestStepTwo" icon={arrowIcon} buttonStyle={styles.nextButton} textStyle={styles.nextText} />
+      </View>
+    );
+  };
+
+  return (
+    <SafeAreaView style={{ flex: 1 }}>
+      <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{ flex: 1 }}>
+        <FlatList
+          data={[{ key: 'content' }]}
+          renderItem={renderContent}
+          keyExtractor={item => item.key}
+  
+        />
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 };
@@ -54,7 +104,7 @@ const styles = StyleSheet.create({
   heading:{
     fontSize: 20,
     fontFamily: "LeagueSpartan-Regular",
-    marginBottom: 25,
+    marginBottom: 10,
     marginTop: 20,
     alignSelf: "center",
   },
@@ -88,5 +138,10 @@ const styles = StyleSheet.create({
     color:'white',
     textAlign: 'left',
     lineHeight: 30,
+  },
+  tagBox:{
+    padding: 15,
+  
   }
+
 });

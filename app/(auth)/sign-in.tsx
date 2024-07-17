@@ -13,7 +13,7 @@ const signInScreen = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const { profile } = useAuth();
+  const { profile, isAdmin } = useAuth();
   //get profile from AuthProvider
   // Function to toggle the password visibility state
   const toggleShowPassword = () => {
@@ -30,12 +30,20 @@ const signInScreen = () => {
     trimInputs();
     try {
       setLoading(true);
-      const { data } = await supabase.auth.signInWithPassword({
+      const { data , error} = await supabase.auth.signInWithPassword({
         email: email,
         password: password,
       });
       console.log(data,"user");
-      router.navigate("/(user)");
+      console.log(error , "error")
+      if (error){
+        Alert.alert("Sign in failed", error.message);
+      }
+      if (isAdmin) {
+        router.push("/(admin)");
+      } else {
+        router.push("(user)")
+      }
     } catch (e: any) {
       setLoading(false);
       console.log("Sign up failed", e);
