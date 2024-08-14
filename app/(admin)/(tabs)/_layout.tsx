@@ -29,10 +29,12 @@ export default function TabLayout() {
       }}>
       <Tabs.Screen
         name="index"
+      
         options={{
           title: 'Home',
           headerShown: false,
-          tabBarIcon: ({ color }) => <TabBarIcon name="home" color={color} />,
+          tabBarActiveTintColor: Colors.green.main,
+          tabBarIcon: ({ color }) => <TabBarIcon name="home" color={color}  />,
           headerRight: () => (
             <Link href="/modal" asChild>
               <Pressable>
@@ -40,7 +42,7 @@ export default function TabLayout() {
                   <FontAwesome
                     name="info-circle"
                     size={25}
-                    color={Colors[colorScheme ?? 'light'].text}
+                    color={Colors.green.main}
                     style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
                   />
                 )}
@@ -54,6 +56,7 @@ export default function TabLayout() {
         options={{
           title: 'My Requests',
           headerShown: false,
+          tabBarActiveTintColor: Colors.green.main,
           tabBarIcon: ({ color }) => <FontAwesome5 name="box-open" size={25} color={color} />,
         }}
       />
@@ -62,6 +65,7 @@ export default function TabLayout() {
         options={{
           title: 'Profile',
           headerShown: false,
+          tabBarActiveTintColor: Colors.green.main,
           tabBarIcon: ({ color }) => <FontAwesome5 name="user" size={25} color={color}/>,
         }}
       />

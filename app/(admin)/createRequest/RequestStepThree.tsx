@@ -1,5 +1,5 @@
 import React,{useEffect, useState} from 'react';
-import { View, Text, StyleSheet, Image,TextInput,FlatList } from 'react-native';
+import { View, Text, StyleSheet, Image,TextInput,FlatList, Alert } from 'react-native';
 import RoundedButton from '@/components/RoundedButton';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import StepCounter from '@/components/StepCounter';
@@ -8,11 +8,18 @@ import { AntDesign, Feather } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker'
 import { useFormContext } from '@/app/providers/Form';
 import { TouchableOpacity } from 'react-native';
+import {FileObject} from '@supabase/storage-js';
+import * as FileSystem from 'expo-file-system'
+import { router } from 'expo-router';
+
+
+
 const RequestStepThree:React.FC = () => {
   const [text, onChangeText] = useState("");
-  const [images, setImages] = useState([] as string[]);
+  //const [images, setImages] = useState([] as string[]);
+  const [images,setImages]= useState<FileObject[]>([]);
   const [localImages, setLocalImages]= useState<string[]>([]);
-  const { formData, updateFormData,postFormData } = useFormContext();
+  const { formData,uploadImages, updateFormData,postFormData } = useFormContext();
   const uploadIcon = <Feather name="upload" size={18} color="black" />;
   
 
@@ -32,23 +39,41 @@ const RequestStepThree:React.FC = () => {
     })
 
     if (!result.canceled) {
-      const newImages = result.assets.map((asset) => asset.uri);
-      setLocalImages([...localImages, ...newImages]);
-      updateFormData('images', [...formData.images, ...newImages]); // Update form data images array
+      
+      const newImages = await Promise.all(result.assets.map(async(asset) =>{
+        const base64 = await FileSystem.readAsStringAsync(asset.uri,{encoding: FileSystem.EncodingType.Base64});
+        const contentType = asset.type == 'image'? 'image/png': 'image/jpeg';
+        return {base64,contentType,uri: asset.uri}
+      } ));
+      setLocalImages([...localImages, ...newImages.map(img =>img.uri)]);
+      await uploadImages(newImages);
     }
   };
 
   const handleDeleteImage = (index: number) => {
-    const updatedImages = [...localImages];
-    updatedImages.splice(index, 1);
-    setLocalImages(updatedImages);
+    const updatedLocalImages = [...localImages];
+    updatedLocalImages.splice(index, 1);
+    setLocalImages(updatedLocalImages);
+
     const updatedFormDataImages = [...formData.images];
     updatedFormDataImages.splice(index, 1);
-    updateFormData('images', updatedFormDataImages); // Update form data images array
+    updateFormData('images', updatedFormDataImages);// Update form data images array
   };
   
+  const handlePublish = async () => {
+    try{
+       const result = await postFormData();
+       if (!result.success){
+        Alert.alert('Error', 'There was an error posting your request. Please try again later.');
+       }
+       router.push('/(tabs)')
+       
+
+    }catch (error) {
+      console.error('Error posting form data:', error);
+    }
   
-  
+  }
   return (
     <View style={styles.container}>
     <Image style={styles.headBox} source={require("../../../assets/images/birdbox.png")}/>
@@ -93,7 +118,7 @@ const RequestStepThree:React.FC = () => {
 </View>
 <View style={styles.buttonBox}>
     <RoundedButton title="Preview"  buttonStyle={styles.previewButton} textStyle={styles.previewText}/>
-    <RoundedButton title="Publish" onPress={postFormData}  buttonStyle={styles.publishButton} textStyle={styles.publishText}/>
+    <RoundedButton title="Publish" onPress={handlePublish}  buttonStyle={styles.publishButton} textStyle={styles.publishText}/>
 </View>
   </View>
 )

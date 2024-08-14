@@ -2,6 +2,12 @@ import React,{createContext, useContext,useEffect, useState,ReactNode} from 'rea
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from './Auth';
+import { decode } from 'base64-arraybuffer'
+import { Alert } from 'react-native';
+import { Redirect } from 'expo-router';
+
+
+
 interface Item {
     id: number;
     name: string;
@@ -25,10 +31,18 @@ interface FormData {
   images: string[];
   items: Item[];
   tags: { id: number, name: string }[];
-  city: string;
-  suburb: string;
+  latitude: string;
+  longitude: string;
+  place_id: string;
+  main_location: string;
+  secondary_location: string;
+  formatted_address: string;
   status: Status;
-  
+}
+
+interface PostFormDataResult {
+  success: boolean;
+  error?: Error;
 }
 
 interface FormContextProps {
@@ -41,7 +55,8 @@ interface FormContextProps {
     clearFormData: () => void; // New function for clearing form data
     isFormFilled: boolean; // Boolean to track if form data is filled
     setFormFilled: React.Dispatch<React.SetStateAction<boolean>>; 
-    postFormData: () => Promise<void>;
+    postFormData: () => Promise<PostFormDataResult>;
+    uploadImages: (localImages: { base64: string; contentType: string; uri: string }[]) => Promise<void>;
 
   }
 
@@ -67,8 +82,12 @@ interface FormContextProps {
       images: [],
       items: [],
       tags: [],
-      city: '',
-      suburb: '',
+      latitude: '',
+      longitude: '',
+      place_id: '',
+      main_location: '',
+      secondary_location: '',
+      formatted_address: '',
       status: Status.PENDING,
     };
   
@@ -88,8 +107,11 @@ interface FormContextProps {
           // Check if formData is filled
           const isFilled =
             formData.headline !== '' &&
-            formData.city !== '' &&
-            formData.suburb !== '' &&
+            formData.main_location !== '' &&
+            formData.latitude !== '' &&
+            formData.longitude !== '' &&
+            formData.formatted_address !== '' &&
+            formData.secondary_location !== '' &&
             formData.items.length > 0; // You can customize this based on your form requirements
           setFormFilled(isFilled);
         } catch (error) {
@@ -109,19 +131,39 @@ interface FormContextProps {
           // Check if formData is filled
           const isFilled =
             formData.headline !== '' &&
-            formData.city !== '' &&
-            formData.suburb !== '' &&
+           formData.main_location !== '' &&
+            formData.latitude !== '' &&
+            formData.longitude !== '' &&
+            formData.formatted_address !== '' &&
+            formData.secondary_location !== '' &&
             formData.items.length > 0; // You can customize this based on your form requirements
           setFormFilled(isFilled);
         } catch (error) {
           console.error('Error saving formData to AsyncStorage:', error);
         }
-      };
+      };  
   
       saveFormData();
     }, [formData]);
   //create image upload function then update urls in formdata.images with the supabase urls and not local urls for posting 
+    const uploadImages = async (localImages: { base64: string; contentType: string; uri: string }[]) => {
+      const uploadedUrls: string[] = [];
 
+     for (const localImage of localImages){
+      const { base64, contentType, uri } = localImage;
+      const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}`;
+      console.log(localImage, 'localImage')
+      const { data, error } = await supabase.storage.from('donationRequestImages').upload(fileName, decode(localImage.base64),{contentType});
+       if (error) {  
+          console.error('Error uploading image:', error);
+      } else {
+          const url = supabase.storage.from('donationRequestImages').getPublicUrl(fileName).data.publicUrl;
+          uploadedUrls.push(url);
+      }
+      console.log(data,'retuned data')
+     }
+     updateFormData('images', [...formData.images, ...uploadedUrls]);
+    }
     const updateFormData = (key: keyof FormData, value: any) => {
       setFormData((prev) => ({
         ...prev,
@@ -156,6 +198,7 @@ interface FormContextProps {
         items: prev.items.filter((item) => item.id !== itemId),
       }));
     };
+
     const clearFormData = async () => {
       setFormData(initialFormData); // Reset formData to initial empty state
       setFormFilled(false); // Reset isFormFilled state
@@ -165,16 +208,23 @@ interface FormContextProps {
         console.error('Error clearing formData from AsyncStorage:', error);
       }
     };
-    const postFormData = async ()=> {
-      try {
+    const postFormData: () => Promise<PostFormDataResult> = async () => {   
+         try {
+        //create donationRequest
+        updateFormData('status', Status.AVAILABLE);
+        console.log(formData,'- - - - posting form data')
         const { data: donationRequest, error:donationRequestError } = await supabase
         .from('donationRequest')
         .insert([
           { headline: formData.headline,
             description: formData.description,
             images: formData.images,
-            city : formData.city,
-            suburb : formData.suburb,
+            main_location : formData.main_location,
+            secondary_location : formData.secondary_location,
+            latitude : formData.latitude,
+            longitude : formData.longitude,
+            place_id : formData.place_id,
+            formatted_address : formData.formatted_address,
             status : formData.status,
             beneficiary_ID: profile?.id ,
             },
@@ -183,19 +233,62 @@ interface FormContextProps {
         if (donationRequestError) {
           throw donationRequestError;
         }
-
+        //add items
         const donationRequestID = donationRequest[0].id;
         console.log(donationRequestID, 'donationRequestID')
-        
+        for (const item of formData.items){
+          const {data: itemData, error:itemError}= await supabase.from('item').insert([
+            {
+              name: item.name,
+              quantity: item.quantity,
+              category_ID: item.category_ID,
+              donationRequest_ID: donationRequestID,
+              beneficiary_ID: item.beneficiary_ID,
+            }
+          ]).select()
+          if (itemError) {
+            throw itemError;
+          }
+          const itemID = itemData[0].id;
 
+          if (item.category_ID){
+            const {error: itemCategoryError} = await supabase.from('item_categories').insert([
+              {
+                item_ID: itemID,
+                category_ID: item.category_ID
+              }
+            ])
+            if (itemCategoryError){
+              throw itemCategoryError;
+            }
+          }
+        }
+        for (const tag of formData.tags){
+          const {error:tagError}= await supabase.from('donation_request_tags').insert([
+            {
+              tag_ID: tag.id,
+              donationRequest_ID: donationRequestID
+            }
+          ])
+          if (tagError){
+            throw tagError;
+          } 
+        }
+       
+        
+        Alert.alert('Donation Request created successfully');
+        clearFormData();
+        return {success:true};
+    
       }catch (error) {
         console.error('Error posting formData to Supabase:', error);
+        return {success: false, error: error as Error}
       }
     }
 
 
     return (
-      <FormContext.Provider value={{ formData,setFormFilled,isFormFilled, postFormData, updateFormData, addTag, removeTag, clearFormData, addItem, removeItem }}>
+      <FormContext.Provider value={{ formData,setFormFilled,isFormFilled, postFormData, updateFormData, addTag,uploadImages, removeTag, clearFormData, addItem, removeItem }}>
         {children}
       </FormContext.Provider>
     );

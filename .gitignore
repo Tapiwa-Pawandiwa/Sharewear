@@ -62,3 +62,5 @@ amplifytools.xcconfig
 
 expo-env.d.ts
 # @end expo-cli
+.env
+supabase/functions/getSecret/index.ts

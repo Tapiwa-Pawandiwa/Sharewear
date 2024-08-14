@@ -42,7 +42,7 @@ export default function TabOneScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: "#ffff",
   },
   bubble: {
     backgroundColor: Colors.grey.background,

@@ -8,6 +8,10 @@ import 'react-native-reanimated';
 import { useColorScheme } from '@/components/useColorScheme';
 import AuthProvider from './providers/Auth';
 import { FormProvider } from './providers/Form';
+import * as SecureStore from 'expo-secure-store';
+
+
+
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -66,6 +70,10 @@ SplashScreen.preventAutoHideAsync();
 <Stack.Screen name="index" options={{ headerShown: false }} />
 
 */
+
+
+
+
 function RootLayoutNav() {
   const colorScheme = useColorScheme();
 

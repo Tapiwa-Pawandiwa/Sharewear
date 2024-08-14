@@ -10,9 +10,8 @@
     "splash": {
       "image": "./assets/images/logos/main-logo.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#ffffff",
     },
-
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.tapiwap.Sharewear"
@@ -30,7 +29,14 @@
     },
     "plugins": [
       "expo-router",
-      "expo-secure-store"
+      "expo-secure-store",
+      [
+        "@rnmapbox/maps",
+        {
+          "RNMapboxMapsImpl": "mapbox",
+          "RNMapboxMapsDownloadToken": "sk.ey...qg"
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true

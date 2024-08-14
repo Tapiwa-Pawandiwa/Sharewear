@@ -3,6 +3,9 @@ import ToggleSwitch from '@/components/ToggleSwitch';
 import RequestCard from '@/components/RequestCard';
 import { Text, View } from '@/components/Themed';
 import Colors from '@/constants/Colors';
+import { supabase } from '@/lib/supabase';
+import { useAuth } from '@/app/providers/Auth';
+import { useEffect } from 'react';
 
 interface DataItem {
   id: string;
@@ -21,10 +24,24 @@ const data:DataItem[] = [
 ];
 
 export default function TabTwoScreen() {
+
+  const {profile} = useAuth();
   const handleToggle = (state: boolean) => {
     console.log(state);
   };
  
+  const fetchMyRequests = async () => {
+    const { data: donationRequest, error:donationRequestError } = await supabase
+    .from('donationRequest').select('*').eq('beneficiary_ID', profile?.id);
+    console.log(donationRequest, 'donationRequest');
+  }
+
+  useEffect (() => {
+    fetchMyRequests();
+  }
+  ,[])
+
+
 
   const renderItem = ({ item }: { item: DataItem }) => (
     <RequestCard description={item.description} location={item.location} items={item.items} from={item.from} image={item.image} time={item.time} />

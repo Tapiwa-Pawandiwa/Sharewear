@@ -14,6 +14,7 @@ import { useFormContext } from "@/app/providers/Form";
 import { black } from "react-native-paper/lib/typescript/styles/themes/v2/colors";
 import { supabase } from "@/lib/supabase";
 import {SelectList} from 'react-native-dropdown-select-list'
+import { useAuth } from "@/app/providers/Auth";
 
 const ItemAdder: React.FC = () => {
   const [text, onChangeText] = useState("");
@@ -22,7 +23,7 @@ const ItemAdder: React.FC = () => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
   const { formData, updateFormData, removeItem, addItem } = useFormContext();
-
+const {profile} = useAuth();
   interface Category {
     id: string;
     name: string;
@@ -61,7 +62,7 @@ useEffect(() => {
 
   const handleAddItem = () => {
     if (text.trim() !== "") {
-      const newItem = { id: Date.now(), name: text, quantity, category_ID: selectedCategory?.id  };
+      const newItem = { id: Date.now(), name: text, quantity, category_ID: selectedCategory?.id , beneficiary_ID: profile?.id};
       addItem(newItem);
       console.log(formData.items, 'formData added item')
       console.log(selectedCategory, 'selectedCategory')
@@ -126,9 +127,10 @@ useEffect(() => {
         renderItem={({ item }) => (
           <View style={styles.summaryContainer}>
             <Text style={styles.summaryText}>
-              {item.name}: {item.quantity}
+
+             <Text style={styles.amount}>{item.quantity}</Text> x {item.name}
             </Text>
-            <TouchableOpacity onPress={() => handleDeleteItem(item.id)}>
+            <TouchableOpacity style={styles.redButton} onPress={() => handleDeleteItem(item.id)}>
               <AntDesign name="closecircleo" size={20} color={"red"} />
             </TouchableOpacity>
           </View>
@@ -155,12 +157,19 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     padding: 10,
     borderWidth: 1,
-    width: 200,
     alignSelf: "center",
     marginTop: 10,
     marginBottom: 5,
     borderColor: Colors.grey.light,
     borderRadius: 25,
+  },
+  amount :{
+    color: Colors.grey.dark,
+    fontWeight: "bold",
+  
+  },
+  redButton :{
+    marginHorizontal: 10,
   },
   addButton: {
     backgroundColor: Colors.green.alt,
