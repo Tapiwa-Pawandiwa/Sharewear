@@ -145,6 +145,16 @@ interface FormContextProps {
   
       saveFormData();
     }, [formData]);
+
+    const fetchPublicUrl = (fileName: string): string | null => {
+      const { data } = supabase.storage.from('donationRequestImages').getPublicUrl(fileName);
+      if (data === null) {
+        console.error('Error fetching public URL:', data);
+        return null;
+      }
+      return data.publicUrl;
+    };
+
   //create image upload function then update urls in formdata.images with the supabase urls and not local urls for posting 
     const uploadImages = async (localImages: { base64: string; contentType: string; uri: string }[]) => {
       const uploadedUrls: string[] = [];
@@ -152,18 +162,25 @@ interface FormContextProps {
      for (const localImage of localImages){
       const { base64, contentType, uri } = localImage;
       const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}`;
-      console.log(localImage, 'localImage')
       const { data, error } = await supabase.storage.from('donationRequestImages').upload(fileName, decode(localImage.base64),{contentType});
        if (error) {  
           console.error('Error uploading image:', error);
+      } 
+      const publicUrl = fetchPublicUrl(fileName);
+      if (publicUrl) {
+        uploadedUrls.push(publicUrl);
       } else {
-          const url = supabase.storage.from('donationRequestImages').getPublicUrl(fileName).data.publicUrl;
-          uploadedUrls.push(url);
+        console.error('Error retrieving public URL for image:', fileName);
+        Alert.alert('Error', 'An error occurred while fetching the image URL. Please try again.');
       }
       console.log(data,'retuned data')
      }
+     if (uploadedUrls.length > 0)
+     {
      updateFormData('images', [...formData.images, ...uploadedUrls]);
+     }
     }
+
     const updateFormData = (key: keyof FormData, value: any) => {
       setFormData((prev) => ({
         ...prev,
