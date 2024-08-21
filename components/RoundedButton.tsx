@@ -12,12 +12,13 @@ type RoundedButtonProps = {
   iconStyle?: ViewStyle;
   link?: string;
   icon?: any;
+  disabled?: boolean; 
 };
 
-const RoundedButton: React.FC<RoundedButtonProps> = ({ title, onPress, buttonStyle, textStyle, link, icon,iconStyle }) => {
+const RoundedButton: React.FC<RoundedButtonProps> = ({ title, onPress, buttonStyle, textStyle, link, icon,iconStyle , disabled}) => {
 const router = useRouter();
 
-if (link) {
+if (link && !disabled) {
   return (
   <Link href={link ?? '' } style={[styles.button, buttonStyle]} asChild>
   <Pressable onPress={onPress}>
@@ -30,7 +31,8 @@ if (link) {
 );
 }
 return (
-  <Pressable onPress={onPress} style={[styles.button, buttonStyle]}>
+
+  <Pressable onPress={disabled ? undefined : onPress} style={[styles.button, buttonStyle]}>
     <View style={styles.buttonContainer}>
       <Text style={[styles.buttonText, textStyle]}>{title}</Text>
       {icon && <View style={iconStyle}>{icon}</View>}

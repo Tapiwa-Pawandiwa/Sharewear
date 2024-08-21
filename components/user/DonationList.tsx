@@ -1,23 +1,19 @@
 import React from 'react';
 import { View, Text } from 'react-native';
 import {ScrollView} from 'react-native-gesture-handler';
-
+import DonationCard from './DonationCard';
 
 
 
 const DonationList = () => {
 
-
-
   return (
     <View>
-        <View> 
-            <Text>Latest Donation Requests</Text>
-        </View>
-
-
+      <Text>DonationList</Text>
+      <ScrollView>
+      </ScrollView>
     </View>
   )
 }
 
-export default DonationList
+export default DonationList;

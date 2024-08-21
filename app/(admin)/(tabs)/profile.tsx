@@ -6,16 +6,9 @@ import { useAuth } from '@/app/providers/Auth'
 import Colors from '@/constants/Colors'
 
 
-const signUserOut = async () => {
-  try {
-    console.log('Sign out')
-    supabase.auth.signOut()
-  } catch (e: any) {
-    console.log('Sign out failed', e)
-  }
-}
+
 const profile = () => {
-  const {profile} = useAuth();
+  const {profile, signUserOut} = useAuth();
   return (
     <View style={styles.mainContainer}>
       <View style={styles.avatarContainer}>

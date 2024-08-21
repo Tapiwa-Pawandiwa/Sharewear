@@ -1,14 +1,15 @@
 import React from 'react'
 import { View, Text,StyleSheet,Image } from 'react-native'
-import RoundedButton from './RoundedButton';
+import RoundedButton from '../RoundedButton';
 import Colors from '@/constants/Colors';
+import RemoteImage from '../RemoteImage';
 
 interface RequestCardProps {
     description : string;
     location: string;
     items: number;
     from: string;
-    image: any;
+    image: string;
     time: string;
 }
 
@@ -19,7 +20,10 @@ const RequestCard:React.FC<RequestCardProps> = ({description,location,items,from
   //Add max quanity for the amount of characters in the description 
     return (
   <View style={styles.container}>
-    <Image source={image} style={styles.image} />
+    <RemoteImage style={styles.image} 
+    path={image}
+    fallback={'https://via.placeholder.com/200'}
+    />
     <View style={styles.heading}>
         <Text style={styles.descriptionStyle}>{description}</Text>
         <Text style={styles.locationStyle}>{location}</Text>

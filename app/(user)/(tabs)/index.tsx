@@ -13,6 +13,7 @@ const index = () => {
   }
   if (!session) {
     console.log(profile, 'profile')
+    console.log(session, 'session')
     return <Redirect href="/(auth)/sign-in" />
 
   }

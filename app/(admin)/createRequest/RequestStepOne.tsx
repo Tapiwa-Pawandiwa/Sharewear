@@ -28,7 +28,6 @@ const RequestStepOne: React.FC = () => {
 
   useEffect(() => {    
     clearFormData();
-    console.log(formData, 'formData Step 1')
   }
   ,[])
 //i should figure out how i should store address in the database so that a user can just put "drop_off_location" for the items they need - then 

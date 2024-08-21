@@ -1,5 +1,5 @@
 import React,{useEffect, useState} from 'react';
-import { View, Text, StyleSheet, Image,TextInput,FlatList, Alert } from 'react-native';
+import { View, Text, StyleSheet, Image,TextInput,FlatList, Alert, ActivityIndicator } from 'react-native';
 import RoundedButton from '@/components/RoundedButton';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import StepCounter from '@/components/StepCounter';
@@ -10,28 +10,24 @@ import { useFormContext } from '@/app/providers/Form';
 import { TouchableOpacity } from 'react-native';
 import {FileObject} from '@supabase/storage-js';
 import * as FileSystem from 'expo-file-system'
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
+import { Modal } from 'react-native';
+import { Status } from '@/app/providers/Form';
+import { CustomAlertModal } from '@/components/CustomAlertModal';
+import Icons from '../../../assets/Assets';
 
 
 
 const RequestStepThree:React.FC = () => {
   const [text, onChangeText] = useState("");
-  //const [images, setImages] = useState([] as string[]);
-  const [images,setImages]= useState<FileObject[]>([]);
-  const [localImages, setLocalImages]= useState<string[]>([]);
+  const [localImages, setLocalImages] = useState<{ base64: string, contentType: string, uri: string }[]>([]); // Properly typed state
   const { formData,uploadImages, updateFormData,postFormData } = useFormContext();
   const uploadIcon = <Feather name="upload" size={18} color="black" />;
-  
-
-
-  useEffect(() => {
-    console.log(formData, 'formData Step 3')
-  }
-    ,[])
-
-
-
-  const pickImage = async()=>{
+  const [isUploading, setIsUploading] = useState(false);
+  const [progress, setProgress] = useState(0); // Progress state
+  const [modalVisible, setModalVisible] = useState(false); // State to control the modal visibility
+  const params = useLocalSearchParams();
+  const pickImage = async() => {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsMultipleSelection: true, 
@@ -39,39 +35,83 @@ const RequestStepThree:React.FC = () => {
     })
 
     if (!result.canceled) {
-      
-      const newImages = await Promise.all(result.assets.map(async(asset) =>{
-        const base64 = await FileSystem.readAsStringAsync(asset.uri,{encoding: FileSystem.EncodingType.Base64});
-        const contentType = asset.type == 'image'? 'image/png': 'image/jpeg';
-        return {base64,contentType,uri: asset.uri}
-      } ));
-      setLocalImages([...localImages, ...newImages.map(img =>img.uri)]);
-      await uploadImages(newImages);
-    }
+      const newImages = await Promise.all(result.assets.map(async (asset) => {
+          const base64 = await FileSystem.readAsStringAsync(asset.uri, { encoding: FileSystem.EncodingType.Base64 });
+          const contentType = asset.type === 'image' ? (asset.uri.endsWith('.png') ? 'image/png' : 'image/jpeg') : 'image/jpg';
+          return { uri: asset.uri, base64, contentType }; // Ensure all properties are included
+      }));
+      setLocalImages([...localImages, ...newImages]);
+  }
   };
+  useEffect(() => {
+    console.log('Form data updated:', formData);
+  }, [formData]);
+  
 
   const handleDeleteImage = (index: number) => {
     const updatedLocalImages = [...localImages];
     updatedLocalImages.splice(index, 1);
     setLocalImages(updatedLocalImages);
-
-    const updatedFormDataImages = [...formData.images];
-    updatedFormDataImages.splice(index, 1);
-    updateFormData('images', updatedFormDataImages);// Update form data images array
   };
   
   const handlePublish = async () => {
-    try{
-       const result = await postFormData();
-       if (!result.success){
-        Alert.alert('Error', 'There was an error posting your request. Please try again later.');
-       }
-       router.push('/(tabs)')
-       
+    console.log('Starting handlePublish, images:', formData.images);
 
+    if (localImages.length === 0) {
+      Alert.alert('Error', 'Please upload at least one image before publishing.');
+      return;
+    }
+    setIsUploading(true);
+    setModalVisible(true);
+  
+    try{
+      let currentProgress = 0;
+      const interval = setInterval(() => {
+          currentProgress += 0.2;
+          setProgress(currentProgress);
+          if (currentProgress >= 1) clearInterval(interval);
+      }, 400);
+
+      const uploadedFilePaths = await uploadImages(localImages);
+
+      console.log('After uploadImages, images:', formData.images);
+      if (uploadedFilePaths.length === 0) {
+        Alert.alert('Error', 'There was an error uploading your images. Please try again.');
+        return;
+      }  
+    
+      const updatedFormData = {
+        ...formData,
+        images: [...formData.images, ...uploadedFilePaths],
+        status: Status.AVAILABLE,
+      };
+      console.log('Updated formData:', updatedFormData);
+  
+      // Post the updated form data
+      const result = await postFormData(updatedFormData);
+      
+      if (result.success) {
+        setModalVisible(false);
+        router.push({
+          pathname: '/(tabs)',
+          params: {
+            showModal: 'true', // pass a parameter to show the modal
+          },
+        });
+      } else {
+        Alert.alert('Error', 'There was an error posting your request. Please try again later.');
+      }
+  
+
+      
     }catch (error) {
       console.error('Error posting form data:', error);
-    }
+      Alert.alert('Error', 'There was an error uploading your images or posting your request. Please try again.');
+    } finally {
+      setIsUploading(false);
+      setModalVisible(true);
+      
+  }
   
   }
   return (
@@ -106,7 +146,7 @@ const RequestStepThree:React.FC = () => {
           keyExtractor={(item, index) => index.toString()}
           renderItem={({ item, index }) => (
             <View style={styles.summaryItem}>
-              <Image source={{ uri: item }} style={styles.image} />
+              <Image source={{ uri: item.uri }} style={styles.image} />
               <TouchableOpacity onPress={() => handleDeleteImage(index)}>
                 <AntDesign name="close" size={20} color="red" style={styles.deleteIcon} />
               </TouchableOpacity>
@@ -118,7 +158,22 @@ const RequestStepThree:React.FC = () => {
 </View>
 <View style={styles.buttonBox}>
     <RoundedButton title="Preview"  buttonStyle={styles.previewButton} textStyle={styles.previewText}/>
-    <RoundedButton title="Publish" onPress={handlePublish}  buttonStyle={styles.publishButton} textStyle={styles.publishText}/>
+    <RoundedButton title="Publish"
+     onPress={handlePublish}  
+     buttonStyle={styles.publishButton} 
+     textStyle={styles.publishText}
+     disabled={isUploading}
+     />
+
+     {isUploading &&     <CustomAlertModal
+                visible={modalVisible}
+                loading={isUploading}
+                progress={progress}
+                message='Uploading images and posting request...'
+                onClose={() => setModalVisible(false)} // Pass the progress value to the modal
+            />}
+
+
 </View>
   </View>
 )

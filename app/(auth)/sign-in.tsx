@@ -1,5 +1,12 @@
 import { View } from "@/components/Themed";
-import { Text, StyleSheet, TextInput, Image, Alert } from "react-native";
+import {
+  Text,
+  StyleSheet,
+  TextInput,
+  Image,
+  Alert,
+  Pressable,
+} from "react-native";
 import React, { useContext, useState } from "react";
 import { Link, router } from "expo-router";
 import Colors from "@/constants/Colors";
@@ -7,6 +14,7 @@ import RoundedButton from "@/components/RoundedButton";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "../providers/Auth";
+import * as Linking from "expo-linking";
 const signInScreen = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -14,15 +22,25 @@ const signInScreen = () => {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const { profile, isAdmin } = useAuth();
-  //get profile from AuthProvider
-  // Function to toggle the password visibility state
+  const [alertVisible, setAlertVisible] = useState<boolean>(false);
+  const [isEmailFocused, setIsEmailFocused] = useState(false);
+  const [isPasswordFocused, setIsPasswordFocused] = useState(false);
+
+  const showAlert = () => {
+    setAlertVisible(true);
+  };
+
+  const hideAlert = () => {
+    setAlertVisible(false);
+    setError("");
+  };
+
   const toggleShowPassword = () => {
     setShowPassword(!showPassword);
   };
 
   const trimInputs = () => {
     setEmail(email.trim());
-
     setPassword(password.trim());
   };
 
@@ -30,19 +48,21 @@ const signInScreen = () => {
     trimInputs();
     try {
       setLoading(true);
-      const { data , error} = await supabase.auth.signInWithPassword({
+      const { data, error } = await supabase.auth.signInWithPassword({
         email: email,
         password: password,
       });
-      console.log(data,"user");
-      console.log(error , "error")
-      if (error){
-        Alert.alert("Sign in failed", error.message);
-      }
-      if (isAdmin) {
-        router.push("/(admin)");
+
+      if (error) {
+        setError(error.message);
       } else {
-        router.push("(user)")
+        setError("");
+        if (isAdmin){
+          router.push("/(admin)");
+        }else {
+          router.push("/(user)");
+        }
+        console.log("Sign in successful", data);
       }
     } catch (e: any) {
       setLoading(false);
@@ -64,6 +84,19 @@ const signInScreen = () => {
     }
     //expo go not supported so need work around here
   };
+
+  const resetPasssword = async (email: string) => {
+    console.log("reset password requested ...");
+    const resetPassswordURL = "sharewear://reset-password";
+    try {
+      const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: resetPassswordURL,
+      });
+    } catch (error) {
+      console.error("Error sending password reset email:", error);
+    }
+  };
+
   return (
     <View style={styles.container}>
       <Image
@@ -75,22 +108,34 @@ const signInScreen = () => {
         style={{
           borderBottomColor: "black",
           borderBottomWidth: StyleSheet.hairlineWidth,
-            width: 300,
+          width: 300,
         }}
       ></View>
+
       <TextInput
-        style={styles.input}
+        style={[
+          styles.input,
+          { borderColor: isEmailFocused ? Colors.green.main : "black" },
+        ]}
         placeholder="Email"
         onChangeText={setEmail}
         value={email}
+        onFocus={() => setIsEmailFocused(true)}
+        onBlur={() => setIsEmailFocused(false)}
       />
       <View style={styles.passwordContainer}>
         <TextInput
-          style={styles.input}
+          style={[
+            styles.input,
+            ,
+            { borderColor: isPasswordFocused ? Colors.green.main : "black" },
+          ]}
           placeholder="Password"
           value={password}
           secureTextEntry={!showPassword}
           onChangeText={setPassword}
+          onFocus={() => setIsPasswordFocused(true)}
+          onBlur={() => setIsPasswordFocused(false)}
         />
         <MaterialCommunityIcons
           name={showPassword ? "eye-off" : "eye"}
@@ -100,19 +145,24 @@ const signInScreen = () => {
           onPress={toggleShowPassword}
         />
       </View>
-
-      <Link href="">
-        <Text>
-          Forgot Password? <Text style={styles.resetText}>Reset Password </Text>
-        </Text>
-      </Link>
-      <Text>
-        Don't have an account?
+      <View style={{ flexDirection: "row" }}>
+        <Text style={styles.loginSubtitle}>Don't have an account?</Text>
         <Link href="/(auth)/sign-up">
-          <Text style={styles.resetText}> Sign Up</Text>
+          <Text style={[styles.textLink, { color: Colors.green.main }]}>
+            {" "}
+            Sign Up
+          </Text>
         </Link>
-      </Text>
-
+      </View>
+      <View style={{ flexDirection: "row" }}>
+        <Pressable onPress={showAlert}>
+          <Text style={[styles.textLink, { color: Colors.green.main }]}>
+            {" "}
+            Reset Password
+          </Text>
+        </Pressable>
+      </View>
+      {error && <Text style={{ color: "red" }}>{error}</Text>}
       <RoundedButton
         title="Sign In"
         onPress={signInwithEmail}
@@ -120,7 +170,6 @@ const signInScreen = () => {
         textStyle={styles.buttonText}
         link=""
       />
-      {error && <Text style={{ color: "red" }}>{error}</Text>}
       <RoundedButton
         title="Sign Out"
         onPress={onSignOut}
@@ -157,7 +206,7 @@ const styles = StyleSheet.create({
     color: Colors.green.main,
     fontSize: 16,
     textDecorationLine: "underline",
-    marginBottom: 20,  
+    marginBottom: 20,
   },
   input: {
     height: 40,
@@ -165,14 +214,20 @@ const styles = StyleSheet.create({
     margin: 12,
     borderWidth: 1,
     padding: 10,
-    backgroundColor: "white",
+    backgroundColor: Colors.grey.alt,
     borderRadius: 10,
     borderColor: "black",
+  },
+  textLink: {
+    color: Colors.green.main,
+
+    fontFamily: "Helvetica",
   },
   passwordContainer: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
+    borderColor: "black",
   },
   icon: {
     position: "absolute",

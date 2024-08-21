@@ -12,7 +12,7 @@ import { useColorScheme } from '@/components/useColorScheme';
     if (!session) {
         return <Redirect href="/(auth)" />
     }
-    if (isAdmin) {
+    if (isAdmin && profile?.user_type=='Beneficiary') {
         return <Redirect href="/(admin)" />
     }
     return (

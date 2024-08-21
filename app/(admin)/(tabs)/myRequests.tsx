@@ -1,66 +1,110 @@
 import { StyleSheet ,Image,FlatList} from 'react-native';
 import ToggleSwitch from '@/components/ToggleSwitch';
-import RequestCard from '@/components/RequestCard';
+import RequestCard from '@/components/admin/RequestCard';
 import { Text, View } from '@/components/Themed';
 import Colors from '@/constants/Colors';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/app/providers/Auth';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { useDonationRequestsWithCategoryAndTags } from '@/app/hooks/useDonationRequests';
+import Carousel from 'react-native-reanimated-carousel';
+import RemoteImage from '@/components/RemoteImage';
+import FilterChipList from '@/components/FilterChipList';
 
 interface DataItem {
   id: string;
-  description: string;
-  location: string;
+  headline: string;
+  formatted_address: string;
   items: number;
   from: string;
-  image: any;
+  image: string;
   time: string;
 }
 
-const data:DataItem[] = [
-  {id: '1',description : 'Help me with my groceries', location: 'Prenzlauer-Berg', items: 5, from: 'Olly', image: require('../../../assets/images/foodboxes.jpg'), time: '23:00:10'},
-  {id: '2',description : 'Help me with my wheelchair', location: 'Prenzlauer-Berg', items: 3, from: 'David', image: require('../../../assets/images/wheelchair.jpg'), time: '23:00:10'},
-  {id: '3',description : 'Help me with baby supplies', location: 'Prenzlauer-Berg', items: 3, from: 'Jessica', image: require('../../../assets/images/babyImage.jpg'), time: '23:00:10'},
-];
+
+interface DonationRequest {
+  id: string;
+  headline: string;
+  description: string;
+  status: string;
+  latitude: number;
+  longitude: number;
+  formatted_address: string;
+  main_location: string;
+  secondary_location: string;
+  images: string[];  // Array of image URLs
+  category_id?: string;  // Assuming category_id might be optional
+  category_name?: string;  // Optional if using with category data
+  tag_names?: string[];  // Optional if using with tags data
+  item_names?: string[];  // Optional if using with item data
+}
+
+
+
 
 export default function TabTwoScreen() {
-
+  const { data: donationRequestsWithCategoryAndTags, error, isLoading } = useDonationRequestsWithCategoryAndTags();
+  const [imageUrls, setImageUrls] = useState<string[]>([]);
   const {profile} = useAuth();
+
+
+
+
   const handleToggle = (state: boolean) => {
     console.log(state);
   };
+
  
   const fetchMyRequests = async () => {
     const { data: donationRequest, error:donationRequestError } = await supabase
     .from('donationRequest').select('*').eq('beneficiary_ID', profile?.id);
-    console.log(donationRequest, 'donationRequest');
   }
 
-  useEffect (() => {
-    fetchMyRequests();
-  }
-  ,[])
+
 
 
 
   const renderItem = ({ item }: { item: DataItem }) => (
-    <RequestCard description={item.description} location={item.location} items={item.items} from={item.from} image={item.image} time={item.time} />
+    <RequestCard
+      description={item.headline}
+      location={item.formatted_address}
+      items={item.items}
+      from={item.from}
+      image={item.image}
+      time={item.time}
+    />
   );
+  const transformedData: DataItem[] = donationRequestsWithCategoryAndTags?.map(request => ({
+    id: request.id,
+    headline: request.headline,
+    formatted_address: request.formatted_address,
+    items: request.item_names?.length || 0,  // count of items
+    image: request.images?.[0] || 'https://via.placeholder.com/200',  // Pass image URL to RequestCard
+    from: '', // Add the 'from' property here
+    time: new Date().toLocaleTimeString(),  // or use a proper timestamp if available
+  })) || [];
+  
 
   return (
     <View style={styles.container}>
       <View style={styles.headerContainer}>
       <View style={styles.innerContainer}>
-        <Image source={require('../../../assets/images/birdbox.png')} style={styles.image} />
          <Text style={styles.title}>My Requests</Text>
+         <Image source={require('../../../assets/images/birdbox.png')} style={styles.image} />
       </View>
-      <ToggleSwitch initialState={false} onToggle={handleToggle} style={styles.toggleSwitch}/>
+      <View style={styles.filterContainer}>
+           <FilterChipList  />
       </View>
-      <FlatList 
-        data={data}
+      </View>
+     
+   <View style={styles.results}>
+        <FlatList
+        data={transformedData}
         keyExtractor={item => item.id}
         renderItem={renderItem}
       />
+   </View>
+  
     </View>
   );
 }
@@ -68,41 +112,44 @@ export default function TabTwoScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
- 
   },
   title: {
     fontSize: 30,
-    fontWeight: 'bold',
-    fontFamily: 'LeagueSpartan-Regular',
-    marginLeft: 20,
+    marginLeft: 10,
+    fontFamily: 'Now-Bold',
   },
   image: {
-    width: 60,
-    height: 60,
-    marginLeft: 20,
+    width: 50,
+    height: 50,
+    marginLeft: 80,
+      marginTop: -20,
+    
+
   },
   headerContainer: {
-    backgroundColor: Colors.grey.background,
-    height: 210,
+    height: 140,
     borderRadius: 40,
     width: '95%',
-    marginTop: 10,
+    marginTop: 35,
     marginLeft: 10,
-    marginBottom: 20,
-    padding: 15,
+   
   },
   innerContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: Colors.grey.background,
     borderRadius: 40,
     marginTop: 50,
     width: '95%',
     marginLeft: 10,
+    marginBottom: 20,
   
   },
-  toggleSwitch: {
-    marginTop: 20,
-    marginLeft: 20,
+  filterContainer:{
+    marginBottom: 10,
+    alignItems: 'center',
   },
+  results:{
+    marginTop: 25,
+  }
+
 });

@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
 import Colors from "@/constants/Colors";
-import RoundedButton from "./RoundedButton"; 
+import RoundedButton from "../RoundedButton"; 
 import { useFormContext } from "@/app/providers/Form";
 import { black } from "react-native-paper/lib/typescript/styles/themes/v2/colors";
 import { supabase } from "@/lib/supabase";

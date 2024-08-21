@@ -6,7 +6,7 @@ import { useRouter } from 'expo-router';
 import StepCounter from '@/components/StepCounter';
 import { AntDesign } from '@expo/vector-icons';
 import Colors from '@/constants/Colors';
-import ItemAdder from '@/components/ItemAdder';
+import ItemAdder from '@/components/admin/ItemAdder';
 import { useFormContext } from '@/app/providers/Form';
 const RequestStepTwo:React.FC = () => {
   const router = useRouter();
@@ -15,7 +15,6 @@ const RequestStepTwo:React.FC = () => {
  
   const arrowIcon = <AntDesign name="arrowright" size={24} color="white" />;
 useEffect(() => {
-  console.log(formData, 'formData Step 2')
   }
   ,[])
   return (

@@ -17,25 +17,19 @@ const signUpScreen = () => {
   const [password, setPassword] = useState("");
   const [lastName, setLastName] = useState(""); // [value, setValue
   const [userType, setUserType] = useState("Donor");
+  const [phone, setPhone] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const {isAdmin} = useAuth();
-  //const [userType, setUserTypeState] = useState<RootState['user']['userType']>('Donor');
- // const [error, setError] = useState("");
+
   const [loading, setLoading] = useState(false);
 
   const [showPassword, setShowPassword] = useState(false);
-
-  /*
-  const handleUserTypeChange = (newType: RootState['user']['userType']) => {
-   setUserTypeState(newType);
-  
-  };
-  */
   const trimInputs = () => {
     setEmail(email.trim());
     setFirstName(firstName.trim());
     setPassword(password.trim());
     setLastName(lastName.trim());
+    setPhone(phone.trim());
   };
 
   const signUpwithEmail = async () => {
@@ -57,12 +51,14 @@ const signUpScreen = () => {
               last_name: lastName,
               user_type: userType,
               username: email,
+              phone_number: phone,
             }
           }
         }
       )
       console.log(data, 'data');
       if(error){
+        console.log(error,'error signing up')
         throw error;
       }
       //auto sign in after sign up
@@ -133,6 +129,14 @@ const signUpScreen = () => {
         placeholder="Email"
         onChangeText={setEmail}
         value={email}
+      />
+        <TextInput
+        style={styles.input}
+        autoCapitalize="none"
+        keyboardType="phone-pad"
+        placeholder="Phone Number"
+        onChangeText={setPhone}
+        value={phone}
       />
       <View style={styles.passwordContainer}>
         <TextInput

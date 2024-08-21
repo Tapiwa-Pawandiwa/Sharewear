@@ -23,14 +23,12 @@ const ToggleSwitch:React.FC<ToggleSwitchProps> = ({initialState=false, onToggle,
         <TouchableOpacity 
                 style={[styles.button, !isCompleted && styles.activeButton]}
                 onPress={() => handleToggle(false)}
-
         >
         <Text style={[styles.text, !isCompleted && styles.activeText]}>Pending</Text>
         </TouchableOpacity>
         <TouchableOpacity
                 style={[styles.button, isCompleted && styles.activeButton]}
                 onPress={() => handleToggle(true)}
-
         >
         <Text style={[styles.text, isCompleted && styles.activeText]}>Completed</Text>
         </TouchableOpacity>
