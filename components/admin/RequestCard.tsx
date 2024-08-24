@@ -27,7 +27,7 @@ const RequestCard:React.FC<RequestCardProps> = ({description,location,items,from
     <View style={styles.heading}>
         <Text style={styles.descriptionStyle}>{description}</Text>
         <Text style={styles.locationStyle}>{location}</Text>
-        <Text style={styles.itemStyle}>{items} Items {"\n"}From: {from}</Text>
+        <Text style={styles.itemStyle}>{items} Items</Text>
     </View>
     <View style={styles.rightContainer}>
         <Text>{time}</Text>
@@ -64,9 +64,11 @@ const styles = StyleSheet.create({
      
     },
     locationStyle: {
-        fontSize: 14,
+        fontSize: 10,
+        width: 140,
+        marginBottom: 5,
         color: 'black',
-        fontFamily: 'LeagueSpartan-Light',
+        fontFamily: 'Now-Light',
     },
     itemStyle: {    
         fontSize: 12,
@@ -76,7 +78,7 @@ const styles = StyleSheet.create({
     image: {
         width: 120,
         height: 80,
-        marginLeft: 0,
+        marginLeft: 10,
         marginTop: 10,
         borderRadius: 20,
     },
@@ -86,10 +88,12 @@ const styles = StyleSheet.create({
         height: 30,
         justifyContent: 'center',
         alignContent: 'center',
+        marginRight: 10,
+
     },
     buttonText: {
         color: 'black',
-        fontSize: 10,
+        fontSize: 12,
         lineHeight: 10,
     },
     rightContainer:{

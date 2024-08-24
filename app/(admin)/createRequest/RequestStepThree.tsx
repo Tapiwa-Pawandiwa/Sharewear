@@ -25,14 +25,17 @@ const RequestStepThree:React.FC = () => {
   const uploadIcon = <Feather name="upload" size={18} color="black" />;
   const [isUploading, setIsUploading] = useState(false);
   const [progress, setProgress] = useState(0); // Progress state
+  const [pickingImage, setPickingImage] = useState(false);
   const [modalVisible, setModalVisible] = useState(false); // State to control the modal visibility
   const params = useLocalSearchParams();
   const pickImage = async() => {
+   
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsMultipleSelection: true, 
       quality: 1,
     })
+    setPickingImage(true);
 
     if (!result.canceled) {
       const newImages = await Promise.all(result.assets.map(async (asset) => {
@@ -41,12 +44,10 @@ const RequestStepThree:React.FC = () => {
           return { uri: asset.uri, base64, contentType }; // Ensure all properties are included
       }));
       setLocalImages([...localImages, ...newImages]);
+      setPickingImage(false);
   }
   };
-  useEffect(() => {
-    console.log('Form data updated:', formData);
-  }, [formData]);
-  
+
 
   const handleDeleteImage = (index: number) => {
     const updatedLocalImages = [...localImages];
@@ -65,6 +66,7 @@ const RequestStepThree:React.FC = () => {
     setModalVisible(true);
   
     try{
+    
       let currentProgress = 0;
       const interval = setInterval(() => {
           currentProgress += 0.2;
@@ -89,7 +91,7 @@ const RequestStepThree:React.FC = () => {
   
       // Post the updated form data
       const result = await postFormData(updatedFormData);
-      
+
       if (result.success) {
         setModalVisible(false);
         router.push({
@@ -101,9 +103,6 @@ const RequestStepThree:React.FC = () => {
       } else {
         Alert.alert('Error', 'There was an error posting your request. Please try again later.');
       }
-  
-
-      
     }catch (error) {
       console.error('Error posting form data:', error);
       Alert.alert('Error', 'There was an error uploading your images or posting your request. Please try again.');
@@ -141,7 +140,9 @@ const RequestStepThree:React.FC = () => {
 <RoundedButton title="Upload Image" icon={uploadIcon} onPress={pickImage} iconStyle={styles.iconStyle}   buttonStyle={styles.uploadButton} textStyle={styles.uploadText}/>
 </View>
 <View style={styles.imageSummaryContainer}>
+  {pickingImage && <ActivityIndicator size="large" color={Colors.green.main} />}
 <FlatList
+
           data={localImages}
           keyExtractor={(item, index) => index.toString()}
           renderItem={({ item, index }) => (
@@ -167,8 +168,8 @@ const RequestStepThree:React.FC = () => {
 
      {isUploading &&     <CustomAlertModal
                 visible={modalVisible}
-                loading={isUploading}
                 progress={progress}
+                loading={isUploading}
                 message='Uploading images and posting request...'
                 onClose={() => setModalVisible(false)} // Pass the progress value to the modal
             />}

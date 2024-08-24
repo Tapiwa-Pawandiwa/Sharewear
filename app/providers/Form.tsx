@@ -110,58 +110,6 @@ export const FormProvider: React.FC<FormProviderProps> = ({ children }) => {
     console.log(`Updating ${key} in formData:`, result);
   };
 
-  /*
-    useEffect(() => {
-      const loadFormData = async () => {
-        try {
-          // Load formData from AsyncStorage on component mount
-          const savedFormDataString = await AsyncStorage.getItem('formData');
-          if (savedFormDataString) {
-            const savedFormData = JSON.parse(savedFormDataString);
-            setFormData(savedFormData);
-          }
-          // Check if formData is filled
-          const isFilled =
-            formData.headline !== '' &&
-            formData.main_location !== '' &&
-            formData.latitude !== '' &&
-            formData.longitude !== '' &&
-            formData.formatted_address !== '' &&
-            formData.secondary_location !== '' &&
-            formData.items.length > 0; // You can customize this based on your form requirements
-          setFormFilled(isFilled);
-        } catch (error) {
-          console.error('Error loading formData from AsyncStorage:', error);
-        }
-      };
-  
-      loadFormData();
-    }, []);
-
-    useEffect(() => {
-      const saveFormData = async () => {
-        try {
-          // Save formData to AsyncStorage whenever it changes
-          await AsyncStorage.setItem('formData', JSON.stringify(formData));
-  
-          // Check if formData is filled
-          const isFilled =
-            formData.headline !== '' &&
-           formData.main_location !== '' &&
-            formData.latitude !== '' &&
-            formData.longitude !== '' &&
-            formData.formatted_address !== '' &&
-            formData.secondary_location !== '' &&
-            formData.items.length > 0; // You can customize this based on your form requirements
-          setFormFilled(isFilled);
-        } catch (error) {
-          console.error('Error saving formData to AsyncStorage:', error);
-        }
-      };  
-  
-      saveFormData();
-    }, [formData]);
-*/
   const fetchPublicUrl = (fileName: string): string | null => {
     const { data } = supabase.storage
       .from("donationRequestImages")
@@ -179,10 +127,13 @@ export const FormProvider: React.FC<FormProviderProps> = ({ children }) => {
   ): Promise<string[]> => {  // <-- ensure the return type is a Promise of string array
     const uploadedFilePaths: string[] = [];
   
+    const totalImages = localImages.length;
+
     for (const localImage of localImages) {
       const { base64, contentType } = localImage;
       const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}`;
-  
+      
+
       try {
         const { data, error } = await supabase.storage
           .from("donationRequestImages")
@@ -197,6 +148,7 @@ export const FormProvider: React.FC<FormProviderProps> = ({ children }) => {
           console.log(`Image uploaded successfully: ${data.path}`);
           uploadedFilePaths.push(data.path); // Add the successful upload path to the array
         }
+        
       } catch (error) {
         console.error("Error uploading image:", error);
       }
@@ -236,11 +188,7 @@ export const FormProvider: React.FC<FormProviderProps> = ({ children }) => {
   const clearFormData = async () => {
     setFormData(initialFormData); // Reset formData to initial empty state
     setFormFilled(false); // Reset isFormFilled state
-    try {
-      await AsyncStorage.removeItem("formData"); // Remove saved form data from AsyncStorage
-    } catch (error) {
-      console.error("Error clearing formData from AsyncStorage:", error);
-    }
+   
   };
 
   const postFormData = async (formData: FormData): Promise<PostFormDataResult> => {

@@ -30,7 +30,7 @@ export default function FilterChipList({ onFilterChange }: FilterChipListProps) 
       <FilterChip
         name={item}
         isSelected={item === selectedFilter}
-        onPress={handlePress}
+        onPress={()=>handlePress}
       />
     )}
     contentContainerStyle={styles.container}

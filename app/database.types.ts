@@ -11,14 +11,17 @@ export type Database = {
     Tables: {
       category: {
         Row: {
+          icon_name: string | null
           id: string
           name: string
         }
         Insert: {
+          icon_name?: string | null
           id?: string
           name: string
         }
         Update: {
+          icon_name?: string | null
           id?: string
           name?: string
         }
@@ -346,33 +349,33 @@ export type Database = {
       profiles: {
         Row: {
           avatar_url: string | null
+          email: string | null
           first_name: string | null
           id: string
           last_name: string | null
           phone_number: string | null
           updated_at: string | null
           user_type: string | null
-          username: string | null
         }
         Insert: {
           avatar_url?: string | null
+          email?: string | null
           first_name?: string | null
           id: string
           last_name?: string | null
           phone_number?: string | null
           updated_at?: string | null
           user_type?: string | null
-          username?: string | null
         }
         Update: {
           avatar_url?: string | null
+          email?: string | null
           first_name?: string | null
           id?: string
           last_name?: string | null
           phone_number?: string | null
           updated_at?: string | null
           user_type?: string | null
-          username?: string | null
         }
         Relationships: [
           {
@@ -386,14 +389,17 @@ export type Database = {
       }
       tags: {
         Row: {
+          icon_name: string | null
           id: number
           name: string
         }
         Insert: {
+          icon_name?: string | null
           id?: number
           name: string
         }
         Update: {
+          icon_name?: string | null
           id?: number
           name?: string
         }
@@ -403,6 +409,7 @@ export type Database = {
     Views: {
       donation_requests_with_categories_and_tags: {
         Row: {
+          beneficiary_ID: string | null
           category_names: string[] | null
           description: string | null
           donation_request_id: number | null
@@ -417,7 +424,15 @@ export type Database = {
           status: Database["public"]["Enums"]["status"] | null
           tag_names: string[] | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "donationRequest_beneficiary_ID_fkey"
+            columns: ["beneficiary_ID"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Functions: {

@@ -1,6 +1,7 @@
 import Colors from '@/constants/Colors';
 import React from 'react';
-import { Pressable, Text, StyleSheet } from 'react-native';
+import { Pressable, Text, StyleSheet,View } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 
 type ChipProps = {
   tag: string;
@@ -12,25 +13,52 @@ const Chip: React.FC<ChipProps> = ({ tag, isSelected, onPress }) => {
   return (
     <Pressable
       onPress={() => onPress(tag)}
-      style={[styles.chip, isSelected && styles.selectedChip]}
+      style={styles.chipContainer}
     >
-      <Text style={[styles.chipText, isSelected && styles.selectedChipText]}>
-        {tag}
-      </Text>
+      {isSelected ? (
+  <LinearGradient
+    start={{ x: 0, y: 0 }}
+    end={{ x: 1, y: 1 }}
+    colors={[Colors.green.main, Colors.green.alt]}
+    style={styles.chip}
+  >
+    <Text style={[styles.chipText, styles.selectedChipText]}>{tag}</Text>
+  </LinearGradient>
+) : (
+  <View style={[styles.chip, styles.unselectedChip]}>
+    <Text style={[styles.chipText, styles.unselectedChip]}>
+      {tag}
+    </Text>
+  </View>
+)}
     </Pressable>
+
+
   );
 };
 
 export default Chip;
 
 const styles = StyleSheet.create({
+  chipContainer:{
+marginHorizontal: 2,
+marginVertical: 4,
+
+  },
   chip: {
-    padding: 10,
     borderRadius: 20,
-    backgroundColor: Colors.beige.main,
-    margin: 4,
-    borderWidth: 1,
-    borderColor: 'black',
+    paddingHorizontal: 15, // Ensures consistent padding
+    paddingVertical: 10, // Ensures consistent padding
+    backgroundColor: Colors.theme.accent,
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: 45,
+    minWidth: 70, // Minimum width to handle short texts
+
+   
+  },
+  unselectedChip: {
+    backgroundColor: Colors.theme.accent,
   },
   selectedChip: {
     backgroundColor: 'green',

@@ -8,6 +8,7 @@ import 'react-native-reanimated';
 import { useColorScheme } from '@/components/useColorScheme';
 import AuthProvider, { useAuth } from './providers/Auth';
 import { FormProvider } from './providers/Form';
+import { DonorProvider } from './providers/Donor';
 import * as SecureStore from 'expo-secure-store';
 import * as Linking from 'expo-linking';
 import { QueryClient, QueryClientProvider } from 'react-query';
@@ -110,18 +111,19 @@ useEffect(() => {
 }, []);
 
 const queryClient = new QueryClient();
-
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
      <AuthProvider>
       <QueryClientProvider client={queryClient}>
       <FormProvider>
+        <DonorProvider>
         <Stack>
         <Stack.Screen name="index" options={{ headerShown: false }} />
         <Stack.Screen name="(admin)" options={{ headerShown: false }} />
         <Stack.Screen name="(user)" options={{ headerShown: false }} />
         <Stack.Screen name="(auth)" options={{ headerShown: false }} />
      </Stack>
+     </DonorProvider>
      </FormProvider>
       </QueryClientProvider>
      </AuthProvider>

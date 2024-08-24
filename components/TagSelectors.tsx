@@ -64,15 +64,15 @@ const styles = StyleSheet.create({
   },
   column: {
     justifyContent:'center',
-   paddingHorizontal: 5,
+   paddingHorizontal: 10,
   },
   tagContainer: {
-    padding: 15,
+    padding: 20,
     alignSelf: 'center',
-    width: 200,
+    width: '100%',
   },
   chip: {
-    margin: 4,
+    margin: 10,
   },
   selectedChip: {
     backgroundColor: 'green',

@@ -8,32 +8,38 @@ import Colors from "@/constants/Colors";
 import { useColorScheme } from "@/components/useColorScheme";
 import { useClientOnlyValue } from "@/components/useClientOnlyValue";
 import { useAuth } from "@/app/providers/Auth";
-
-// You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
-function TabBarIcon(props: {
-  name: React.ComponentProps<typeof FontAwesome>["name"];
-  color: string;
-}) {
-  return <FontAwesome size={28} style={{ marginBottom: -3 }} {...props} />;
-}
+import { Entypo } from "@expo/vector-icons";
+import TabIcon from "@/components/TabIcon";
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
 
-  const {session} = useAuth();
+  const { session } = useAuth();
 
-  if(!session){
-    return <Redirect href="/" />
+  if (!session) {
+    return <Redirect href="/" />;
   }
-
 
   return (
     <Tabs
       screenOptions={{
         tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
-        // Disable the static render of the header on web
-        // to prevent a hydration error in React Navigation v6.
         headerShown: useClientOnlyValue(false, true),
+        tabBarShowLabel: false,
+        tabBarStyle: {
+          position: "absolute",
+          bottom: 25,
+          left: 20,
+          right: 20,
+          elevation: 0,
+          shadowColor: "#1C2F14",
+          shadowOffset: { width: 1, height: 10 },
+          shadowOpacity: 0.2,
+          shadowRadius: 20,
+          borderRadius: 35,
+          backgroundColor: '#1C2F14',
+          height: 70,
+        },
       }}
     >
       <Tabs.Screen
@@ -41,7 +47,11 @@ export default function TabLayout() {
         options={{
           title: "Home",
           headerShown: false,
-          tabBarIcon: ({ color }) => <TabBarIcon name="home" color={color} />,
+
+          tabBarActiveTintColor: Colors.green.main,
+          tabBarIcon: ({ focused }) => (
+            <TabIcon name="home" focused={focused} library="FontAwesome" />
+          ),
           headerRight: () => (
             <Link href="/modal" asChild>
               <Pressable>
@@ -63,8 +73,9 @@ export default function TabLayout() {
         options={{
           title: "My Donations",
           headerShown: false,
-          tabBarIcon: ({ color }) => (
-            <FontAwesome5 name="box-open" size={25} color={color} />
+          tabBarActiveTintColor: Colors.green.main,
+          tabBarIcon: ({ focused }) => (
+            <TabIcon name="box-open" focused={focused} library="FontAwesome5" />
           ),
         }}
       />
@@ -73,8 +84,9 @@ export default function TabLayout() {
         options={{
           title: "Near Me",
           headerShown: false,
-          tabBarIcon: ({ color }) => (
-            <FontAwesome5 name="box-open" size={25} color={color} />
+          tabBarActiveTintColor: Colors.green.main,
+          tabBarIcon: ({ focused }) => (
+            <TabIcon name="location" focused={focused} library="Entypo" />
           ),
         }}
       />
@@ -83,8 +95,9 @@ export default function TabLayout() {
         options={{
           title: "Profile",
           headerShown: false,
-          tabBarIcon: ({ color }) => (
-            <FontAwesome5 name="user" size={25} color={color} />
+          tabBarActiveTintColor: Colors.green.main,
+          tabBarIcon: ({ focused }) => (
+            <TabIcon name="user" focused={focused} library="FontAwesome5" />
           ),
         }}
       />

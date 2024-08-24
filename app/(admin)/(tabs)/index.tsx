@@ -81,7 +81,6 @@ export default function TabOneScreen() {
           />
         </View>
         <RoundedButton link="/createRequest/RequestStepOne" onPress={ clearFormData} title="Create Request"  buttonStyle={styles.homeButton} textStyle={styles.buttonText}/>
-        <RoundedButton onPress={handleModal} title="Test" buttonStyle={styles.homeButton} textStyle={styles.buttonText}/>
         {
 
 
