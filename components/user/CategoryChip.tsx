@@ -7,14 +7,16 @@ type CategoryProps = {
   category: {
     id: string;
     name: string;
-    icon_name: string;
+    icon_name: string | null; // Allowing null here
   };
   isSelected: boolean;
   onPress: (categoryId: string) => void;
 };
 
 
-const getIconComponent = (iconName: string) => {
+const getIconComponent = (iconName: string,isSelected: boolean) => {
+  if (!iconName) return null; // Handle the null case
+
   const iconMap: { [key: string]: any } = {
     AntDesign,
     Entypo,
@@ -38,8 +40,16 @@ const getIconComponent = (iconName: string) => {
     return null;
   }
 
-  return <IconComponent name={icon} size={20} color="black" />;
-};
+  return (
+    <View
+      style={[
+        styles.iconContainer,
+        isSelected && styles.selectedIconContainer,
+      ]}
+    >
+      <IconComponent name={icon} size={36} color={isSelected ? 'white' : Colors.theme.background} />
+    </View>
+  );};
 
 const CategoryChip: React.FC<CategoryProps> = ({
   category,
@@ -51,12 +61,8 @@ const CategoryChip: React.FC<CategoryProps> = ({
       onPress={() => onPress(category.id)}
       style={[styles.chipContainer]}
     >
-      <View
-        style={[
-          styles.chip,
-          isSelected ? styles.selectedChip : styles.unselectedChip,
-        ]}
-      >
+    <View style={styles.chip}>
+        {getIconComponent(category.icon_name ?? '', isSelected)}
         <Text
           style={[
             styles.chipText,
@@ -64,10 +70,8 @@ const CategoryChip: React.FC<CategoryProps> = ({
           ]}
         >
           {category.name}
-
         </Text>
-        {getIconComponent(category.icon_name)}
-         </View>
+      </View>
     </Pressable>
   );
 };
@@ -76,33 +80,35 @@ export default CategoryChip;
 
 const styles = StyleSheet.create({
   chipContainer: {
-    marginHorizontal: 2,
+    
     marginVertical: 4,
   },
-  chip: {
- 
-    paddingHorizontal: 15, // Ensures consistent padding
-    paddingVertical: 10, // Ensures consistent padding
+  iconContainer: {
+    borderRadius: 35,
+    height: 60,
+    width: 60,
+    justifyContent: "center",
+    alignItems: "center",
     
+  },
+  selectedIconContainer: {
+    backgroundColor: Colors.green.alt,
+  },
+  chip: {
+    paddingHorizontal: 10,
+    paddingVertical: 10,
     justifyContent: "center",
     alignItems: "center",
     height: 100,
-    minWidth: 70, // Minimum width to handle short texts
   },
-  unselectedChip: {
-    backgroundColor: Colors.theme.accent,
+  chipText: {
+    fontSize: 14,
+    color: "black",
   },
   unselectedChipText: {
     color: "black",
   },
-  selectedChip: {
-    backgroundColor: "green",
-  },
-  chipText: {
-    color: "black",
-    fontSize: 14,
-  },
   selectedChipText: {
-    color: "white",
+    color: "black",
   },
 });

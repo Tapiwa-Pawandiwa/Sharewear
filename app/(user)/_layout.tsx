@@ -17,9 +17,7 @@ import { useColorScheme } from '@/components/useColorScheme';
     }
     return (
          <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-      </Stack>
+         <Slot />
     </ThemeProvider>
     );
 }

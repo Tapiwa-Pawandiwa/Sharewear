@@ -9,12 +9,24 @@ import { useColorScheme } from '@/components/useColorScheme';
 import AuthProvider, { useAuth } from './providers/Auth';
 import { FormProvider } from './providers/Form';
 import { DonorProvider } from './providers/Donor';
-import * as SecureStore from 'expo-secure-store';
 import * as Linking from 'expo-linking';
 import { QueryClient, QueryClientProvider } from 'react-query';
+import * as SecureStore from 'expo-secure-store';
 
 
 
+// const clearAllSecureStore = async (): Promise<void> => {
+//   const keys = ['formData']; // Add all the keys you want to clear
+//   try {
+//     await Promise.all(keys.map(key => SecureStore.deleteItemAsync(key)));
+//     console.log('All specified SecureStore items have been deleted.');
+//   } catch (error) {
+//     console.error('Failed to delete SecureStore items:', error);
+//   }
+// };
+
+// // Usage example
+// clearAllSecureStore();
 
 
 export {

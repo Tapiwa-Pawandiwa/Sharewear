@@ -3,6 +3,7 @@ import {useQuery} from 'react-query';
 import {Alert} from 'react-native';
 import { useState } from 'react';
 import { useAuth } from '../providers/Auth';
+import * as FileSystem from 'expo-file-system';
 import { Tables } from '../database.types';
 
 /* Types */
@@ -49,11 +50,67 @@ const fetchDonationRequestsWithCategory = async (): Promise<DonationRequestWithC
     if (error) {
         throw error;
     }
+  
+        const requestsWithImages = await Promise.all(
+          data.map(async (request) => {
+            const images = await Promise.all(
+              (request.images || []).map(async (path:string) => {
+                const cachedImage = await getCachedImage(path);
+                return cachedImage;
+              })
+            );
+      
+            return { ...request, images };
+          })
+        );
+      
+        return requestsWithImages  || [];
 
-    return data || [];
 }
 
 
+const getCachedImage = async (path: string): Promise<string | null> => {
+    const cacheDir = `${FileSystem.cacheDirectory}images/`;
+    const fileUri = `${cacheDir}${path.replace(/\//g, '_')}`; // Replace slashes with underscores to avoid path issues
+  
+    // Check if the file already exists
+    const fileInfo = await FileSystem.getInfoAsync(fileUri);
+    if (fileInfo.exists) {
+        return fileUri;
+    }
+  
+    // If not, download the image from Supabase
+    const { data, error } = await supabase.storage.from('donationRequestImages').download(path);
+    if (error || !data) {
+        console.error(error);
+        return null;
+    }
+  
+    // Convert Blob to Base64
+    const reader = new FileReader();
+    const blob = data as Blob;
+
+    return new Promise<string | null>((resolve, reject) => {
+        reader.onloadend = async () => {
+            const base64data = (reader.result as string)?.split(',')[1]; // Explicitly assert result as string
+            if (base64data) {
+                // Ensure the cache directory exists
+                await FileSystem.makeDirectoryAsync(cacheDir, { intermediates: true });
+
+                // Write the image to the cache directory
+                await FileSystem.writeAsStringAsync(fileUri, base64data, {
+                    encoding: FileSystem.EncodingType.Base64,
+                });
+
+                resolve(fileUri);
+            } else {
+                reject("Failed to convert blob to base64.");
+            }
+        };
+        reader.onerror = () => reject("Failed to read the blob.");
+        reader.readAsDataURL(blob); // Read the Blob object
+    });
+};
 
 
 

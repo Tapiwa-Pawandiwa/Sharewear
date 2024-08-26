@@ -4,16 +4,23 @@ import { View, Text , FlatList,StyleSheet} from 'react-native';
 import { useCategories, useDonationRequests } from '@/app/hooks/useDonationRequests';
 import CategoryChip from './CategoryChip';
 
+type CategoryListProps = {
+  onCategorySelect: (categoryId: string | null) => void;
+};
 
 
-const CategoryList = () => {
+const CategoryList:React.FC<CategoryListProps> = ({onCategorySelect}) => {
   const { data: categories, isLoading } = useCategories();
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
+  
 
 
   const handlePress = (categoryId: string) => {
     setSelectedCategoryId(categoryId);
     // Navigation logic will be added later
+    const newSelectedCategoryId = categoryId === selectedCategoryId ? null : categoryId;
+    setSelectedCategoryId(newSelectedCategoryId);
+    onCategorySelect(newSelectedCategoryId);
   };
 
 

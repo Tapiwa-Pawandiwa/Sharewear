@@ -1,17 +1,19 @@
 import { useDonationRequests } from "@/app/hooks/useDonationRequests";
 import Colors from "@/constants/Colors";
 import React, { useEffect } from "react";
-import { View, StyleSheet, Text, Image } from "react-native";
+import { View, StyleSheet, Text } from "react-native";
 import Carousel from "react-native-reanimated-carousel";
 import RemoteImage from "../RemoteImage";
+import {Image} from 'expo-image'
 import { Tables } from "@/app/database.types";
+import { Link } from "expo-router";
 
-type DonationRequest = Tables<"donationRequest">;
+type DonationRequestWithCategoryAndTags =
+  Tables<"donation_requests_with_categories_and_tags">;
 
 interface DonationCardProps {
-  donationRequest: DonationRequest;
+  donationRequest: DonationRequestWithCategoryAndTags; // Update the type here
 }
-
 const DonationCard: React.FC<DonationCardProps> = ({ donationRequest }) => {
   const renderImageItem = ({ item }: { item: string }) => {
     return (
@@ -24,17 +26,34 @@ const DonationCard: React.FC<DonationCardProps> = ({ donationRequest }) => {
   };
 
   return (
+    <Link 
+    href={{
+      pathname: '/donationRequest/[id]',
+      params: {
+        id: donationRequest.donation_request_id,
+      },
+    }}
+    >
+
     <View style={styles.container}>
       <Carousel<string> // Explicitly define the type as string
         data={donationRequest.images || []} // Pass the images array
-        renderItem={renderImageItem}
+        renderItem={({ item }) => (
+          <Image
+            source={item}
+            style={styles.image}
+            contentFit="cover"
+            placeholder={{uri: "https://via.placeholder.com/150"}}
+            cachePolicy="memory-disk"
+          />
+        )}
         width={210}
         height={100}
         loop
         style={styles.image}
       />
 
-<View style={styles.textContainer}>
+      <View style={styles.textContainer}>
         <Text style={styles.title} numberOfLines={1} ellipsizeMode="tail">
           {donationRequest.headline}
         </Text>
@@ -42,8 +61,8 @@ const DonationCard: React.FC<DonationCardProps> = ({ donationRequest }) => {
           {donationRequest.formatted_address}
         </Text>
       </View>
-   </View>
-   
+    </View>
+    </Link>
   );
 };
 
@@ -52,11 +71,11 @@ export default DonationCard;
 const styles = StyleSheet.create({
   container: {
     width: 210,
-    height: 180,
+    height: 150,
     backgroundColor: "white",
     borderRadius: 25,
     shadowColor: "black",
-   
+
     margin: 10,
     // Works only on Android
   },
@@ -70,11 +89,10 @@ const styles = StyleSheet.create({
   },
   textContainer: {
     padding: 10,
-    height: 60,
-    marginBottom: 20,
+    height: 40,
+
     marginLeft: -5,
     justifyContent: "center",
-    
   },
   title: {
     fontSize: 16,

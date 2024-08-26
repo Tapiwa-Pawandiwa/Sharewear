@@ -58,14 +58,14 @@ const styles = StyleSheet.create({
     padding: 5,
     height: 50,
     width: 60,
-    marginTop: 30
+    marginTop: 35
   },
   tabText: {
     fontSize: 10,
     textAlign: "center",
   },
   focusedTabItem: {
-    backgroundColor: '#fff',
+    backgroundColor: Colors.green.alt,
     borderRadius: 35,
     width: 50,
     height: 50,
