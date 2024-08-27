@@ -1,5 +1,5 @@
 import { View, Text ,StyleSheet,Image, SafeAreaView} from 'react-native'
-import React from 'react'
+import React, { useState } from 'react'
 import AppIntroSlider from 'react-native-app-intro-slider';
 import Link from '@react-navigation/native';
 import { router } from 'expo-router'; 
@@ -71,28 +71,28 @@ const slides = [
 
 const Onboarding = () => {
 const {session, profile, loading,isAdmin} = useAuth();
+const [isLoading, setIsLoading] = useState(true);  // Add loading state
 
-  useEffect(() => {
-    const checkOnboardingStatus = async () => {
-      const hasSeenOnboarding = await AsyncStorage.getItem('hasSeenOnboarding');
-      if (hasSeenOnboarding) {
-        if (session) {
-          if (isAdmin) {
-            router.navigate('/(admin)');
-          } else {
-            router.navigate('/(user)');
-          }
-        } else {
-          router.navigate('/(auth)/sign-in');
-        }
+
+useEffect(() => {
+  const checkOnboardingStatus = async () => {
+    const hasSeenOnboarding = await AsyncStorage.getItem('hasSeenOnboarding');
+    if (hasSeenOnboarding) {
+      if (session) {
+        router.replace(isAdmin ? '/(admin)' : '/(user)');
+      } else {
+        router.replace('/(auth)/sign-in');
       }
-    };
-    checkOnboardingStatus();
-  }, [session, isAdmin]);
+    } else {
+      setIsLoading(false); // Set loading to false only if onboarding is not yet seen
+    }
+  };
+  checkOnboardingStatus();
+}, [session, isAdmin]);
 
   const handleDone = async () => {
     await AsyncStorage.setItem('hasSeenOnboarding', 'true');
-    router.navigate('/(auth)/sign-in')
+    router.replace('/(auth)/sign-in'); // Use replace to avoid stacking
   }
   return (
     <AppIntroSlider

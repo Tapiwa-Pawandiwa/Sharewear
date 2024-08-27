@@ -5,7 +5,7 @@ import { View, StyleSheet, Text } from "react-native";
 import Carousel from "react-native-reanimated-carousel";
 import RemoteImage from "../RemoteImage";
 import {Image} from 'expo-image'
-import { Tables } from "@/app/database.types";
+import { Tables } from '@/app/database.types';
 import { Link } from "expo-router";
 
 type DonationRequestWithCategoryAndTags =

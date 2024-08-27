@@ -263,6 +263,7 @@ export type Database = {
           id: number
           name: string
           quantity: number
+          status: Database["public"]["Enums"]["status"] | null
         }
         Insert: {
           beneficiary_ID?: string | null
@@ -272,6 +273,7 @@ export type Database = {
           id?: number
           name: string
           quantity: number
+          status?: Database["public"]["Enums"]["status"] | null
         }
         Update: {
           beneficiary_ID?: string | null
@@ -281,6 +283,7 @@ export type Database = {
           id?: number
           name?: string
           quantity?: number
+          status?: Database["public"]["Enums"]["status"] | null
         }
         Relationships: [
           {

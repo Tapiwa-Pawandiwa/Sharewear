@@ -24,12 +24,6 @@ const CategoryList:React.FC<CategoryListProps> = ({onCategorySelect}) => {
   };
 
 
-useEffect(() => {
-
-      console.log(categories);
-    
-  }
-  , [categories]);
 
   if (isLoading) {
     return <Text>Loading...</Text>; // Add a loading indicator or message

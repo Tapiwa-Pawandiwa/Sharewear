@@ -4,17 +4,29 @@ import {Alert} from 'react-native';
 import { useState } from 'react';
 import { useAuth } from '../providers/Auth';
 import * as FileSystem from 'expo-file-system';
-import { Tables } from '../database.types';
+import { Tables } from '@/app/database.types';
 
 /* Types */
 
 type DonationRequest = Tables<'donationRequest'>;
 type DonationRequestWithCategoryAndTags = Tables<'donation_requests_with_categories_and_tags'>;
 type Categories = Tables<'category'>;
+type Item = Tables<'item'>;
 
 
 
 /* DONOR HOOKS */
+
+
+const fetchItems = async (): Promise<Item[]> => {
+    const {data,error } = await supabase.from ('item').select('*');
+
+    if (error) {
+        throw error;
+    }
+    return data || [];
+}
+
 
 const fetchDonationRequests = async (): Promise<DonationRequest[]> => {
     const { data, error } = await supabase
@@ -36,7 +48,6 @@ const fetchCategories = async (): Promise<Categories[]> => {
     if (error) {
         throw error;
     }
-
     return data || [];
 
 }
@@ -143,7 +154,11 @@ const fetchDonationRequestsWithCategoryAndTagsPerProfile = async (profileId: str
     return data || [];
 };
 
- 
+  ///-----------------------------------//
+
+export const useItems = () => {
+    return useQuery('items', fetchItems);
+};
 export const useDonationRequests = () => {
     return useQuery('donationRequests', fetchDonationRequests);
 };

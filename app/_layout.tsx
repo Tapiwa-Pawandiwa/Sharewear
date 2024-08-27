@@ -3,7 +3,7 @@ import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native
 import { useFonts } from 'expo-font';
 import { Stack, useRouter } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import 'react-native-reanimated';
 import { useColorScheme } from '@/components/useColorScheme';
 import AuthProvider, { useAuth } from './providers/Auth';
@@ -12,6 +12,7 @@ import { DonorProvider } from './providers/Donor';
 import * as Linking from 'expo-linking';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import * as SecureStore from 'expo-secure-store';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 
@@ -44,6 +45,7 @@ SplashScreen.preventAutoHideAsync();
 
  function RootLayout() {
   const [loaded, error] = useFonts({
+    
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
     "Inter-Regular": require("../assets/fonts/Inter-Regular.ttf"),
     "Inter-Medium": require("../assets/fonts/Inter-Medium.ttf"),
@@ -64,20 +66,43 @@ SplashScreen.preventAutoHideAsync();
     "LeagueSpartan-Thin": require("../assets/fonts/LeagueSpartan-Thin.ttf"),
     ...FontAwesome.font,
   });
+  const [isAppReady, setIsAppReady] = useState(false);
+  const [initialRoute, setInitialRoute] = useState('');
 
-  // Expo Router uses Error Boundaries to catch errors in the navigation tree.
-  useEffect(() => {
-    if (error) throw error;
-  }, [error]);
+  const router = useRouter();
+  const {isAdmin} = useAuth();
 
   useEffect(() => {
+    const prepareApp = async () => {
+      try {
+        const hasSeenOnboarding = await AsyncStorage.getItem('hasSeenOnboarding');
+        if (hasSeenOnboarding) {
+          setInitialRoute(isAdmin ? '/(admin)' : '/(user)');
+        } else {
+          setInitialRoute('/onboarding');
+        }
+      } catch (e) {
+        console.warn(e);
+        setInitialRoute('/onboarding'); // fallback to onboarding if something goes wrong
+      } finally {
+        setIsAppReady(true);
+        SplashScreen.hideAsync();
+      }
+    };
+
     if (loaded) {
-      SplashScreen.hideAsync();
+      prepareApp();
     }
   }, [loaded]);
 
-  if (!loaded) {
-    return null;
+  useEffect(() => {
+    if (isAppReady && initialRoute) {
+      router.replace(initialRoute);
+    }
+  }, [isAppReady, initialRoute]);
+
+  if (!loaded || !isAppReady) {
+    return null; // Show nothing until the app is ready
   }
 
   return <RootLayoutNav />;
@@ -94,13 +119,15 @@ function RootLayoutNav() {
   const colorScheme = useColorScheme();
   const router = useRouter();
   const { loginWithToken } = useAuth();
+
+
 global.Buffer = global.Buffer || require('buffer').Buffer;
+
 useEffect(() => {
   const handleDeepLink = async (event:any) => {
     const url = event.url;
     const accessToken = url.split('access_token=')[1]?.split('&')[0];
     const refreshToken = url.split('refresh_token=')[1]?.split('&')[0];
-
     if (accessToken && refreshToken) {
       // Call loginWithToken to set the session
       try {
@@ -111,16 +138,13 @@ useEffect(() => {
       }
     }
   };
-
   Linking.addEventListener('url', handleDeepLink);
-
   // Check if the app was opened from a deep link on launch
   Linking.getInitialURL().then((url) => {
     if (url) handleDeepLink({ url });
   });
-
-  
 }, []);
+
 
 const queryClient = new QueryClient();
   return (
@@ -130,10 +154,11 @@ const queryClient = new QueryClient();
       <FormProvider>
         <DonorProvider>
         <Stack>
-        <Stack.Screen name="index" options={{ headerShown: false }} />
-        <Stack.Screen name="(admin)" options={{ headerShown: false }} />
-        <Stack.Screen name="(user)" options={{ headerShown: false }} />
-        <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+                <Stack.Screen name="index"                   options={{ headerShown: false, gestureEnabled: false }}
+                />
+        <Stack.Screen name="(admin)"  options={{ headerShown: false, gestureEnabled: true }} />
+        <Stack.Screen name="(user)" options={{ headerShown: false, gestureEnabled: true }} />
+        <Stack.Screen name="(auth)"  options={{ headerShown: false, gestureEnabled: true }} />
      </Stack>
      </DonorProvider>
      </FormProvider>
