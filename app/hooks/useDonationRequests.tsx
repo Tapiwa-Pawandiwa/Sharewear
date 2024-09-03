@@ -4,7 +4,7 @@ import {Alert} from 'react-native';
 import { useState } from 'react';
 import { useAuth } from '../providers/Auth';
 import * as FileSystem from 'expo-file-system';
-import { Tables } from '@/app/database.types';
+import { Tables } from '../database.types';
 
 /* Types */
 
@@ -54,31 +54,43 @@ const fetchCategories = async (): Promise<Categories[]> => {
 
 
 const fetchDonationRequestsWithCategory = async (): Promise<DonationRequestWithCategoryAndTags[]> => {
+    // Fetch donation requests with associated items
     const { data, error } = await supabase
         .from('donation_requests_with_categories_and_tags')
-        .select('*');
+        .select(`
+            *,
+            item (id, name, quantity, status, donationRequest_ID)
+        `); // This selects related items
 
     if (error) {
         throw error;
     }
-  
-        const requestsWithImages = await Promise.all(
-          data.map(async (request) => {
+
+    if (!data) {
+        return []; // Return an empty array if no data
+    }
+
+    // Filter out donation requests that only have 'COMPLETE' items
+    const filteredData = data.filter(request => 
+        request.item.some((item: Item) => item.status === 'AVAILABLE' || item.status === 'PENDING')
+    );
+
+    // Process images as before
+    const requestsWithImages = await Promise.all(
+        filteredData.map(async (request) => {
             const images = await Promise.all(
-              (request.images || []).map(async (path:string) => {
-                const cachedImage = await getCachedImage(path);
-                return cachedImage;
-              })
+                (request.images || []).map(async (path: string) => {
+                    const cachedImage = await getCachedImage(path);
+                    return cachedImage;
+                })
             );
-      
+
             return { ...request, images };
-          })
-        );
-      
-        return requestsWithImages  || [];
+        })
+    );
 
-}
-
+    return requestsWithImages || [];
+};
 
 const getCachedImage = async (path: string): Promise<string | null> => {
     const cacheDir = `${FileSystem.cacheDirectory}images/`;

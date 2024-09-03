@@ -35,6 +35,7 @@ export type Database = {
           donor_ID: string | null
           id: number
           status: Database["public"]["Enums"]["status"]
+          timer_trigger: boolean | null
         }
         Insert: {
           beneficiary_ID?: string | null
@@ -43,6 +44,7 @@ export type Database = {
           donor_ID?: string | null
           id?: number
           status: Database["public"]["Enums"]["status"]
+          timer_trigger?: boolean | null
         }
         Update: {
           beneficiary_ID?: string | null
@@ -51,6 +53,7 @@ export type Database = {
           donor_ID?: string | null
           id?: number
           status?: Database["public"]["Enums"]["status"]
+          timer_trigger?: boolean | null
         }
         Relationships: [
           {
@@ -152,6 +155,44 @@ export type Database = {
             columns: ["tag_ID"]
             isOneToOne: false
             referencedRelation: "tags"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      donation_timers: {
+        Row: {
+          created_at: string | null
+          donation_id: number
+          expiration_time: string
+          id: number
+          timer_canceled: boolean | null
+          timer_start_time: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          donation_id: number
+          expiration_time: string
+          id?: number
+          timer_canceled?: boolean | null
+          timer_start_time?: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          donation_id?: number
+          expiration_time?: string
+          id?: number
+          timer_canceled?: boolean | null
+          timer_start_time?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "donation_timers_donation_id_fkey"
+            columns: ["donation_id"]
+            isOneToOne: false
+            referencedRelation: "donation"
             referencedColumns: ["id"]
           },
         ]
@@ -451,7 +492,7 @@ export type Database = {
       }
     }
     Enums: {
-      status: "AVAILABLE" | "PENDING" | "COMPLETE" | "UNAVAILABLE"
+      status: "AVAILABLE" | "PENDING" | "COMPLETE" | "UNAVAILABLE" | "FAILED"
       usage: "PERSONAL" | "ORGANIZATION" | "BUSINESS"
     }
     CompositeTypes: {

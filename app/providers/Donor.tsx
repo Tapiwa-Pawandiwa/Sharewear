@@ -6,7 +6,9 @@ import { Session, User } from "@supabase/supabase-js";
 
 interface RequestContextType {
   selectedRequest: Tables<"donation_requests_with_categories_and_tags"> | null;
-  setSelectedRequest: (request: Tables<"donation_requests_with_categories_and_tags">) => void;
+  setSelectedRequest: (
+    request: Tables<"donation_requests_with_categories_and_tags">
+  ) => void;
   items: Tables<"item">[];
   donation: Tables<"donation">[]; // Added donation
   setItems: (items: Tables<"item">[]) => void;
@@ -14,7 +16,6 @@ interface RequestContextType {
   setSelectedItems: React.Dispatch<React.SetStateAction<number[]>>;
   setDonation: (donations: Tables<"donation">[]) => void; // Added setDonation
   createDonation: () => Promise<{ success: boolean; error?: string }>; // Added createDonation
-
 }
 
 const DonationContext = createContext<RequestContextType>({
@@ -27,15 +28,11 @@ const DonationContext = createContext<RequestContextType>({
   donation: [],
   setDonation: () => {},
   createDonation: async () => ({ success: false }), // Added createDonation
-
 });
 
 interface DonorProviderProps {
   children: React.ReactNode;
 }
-
-
-
 
 export const DonorProvider: React.FC<DonorProviderProps> = ({ children }) => {
   const [selectedRequest, setSelectedRequest] =
@@ -45,15 +42,61 @@ export const DonorProvider: React.FC<DonorProviderProps> = ({ children }) => {
   const [selectedItems, setSelectedItems] = useState<number[]>([]);
 
 
-  const createDonation = async (): Promise<{ success: boolean; error?: string }> => {
-    if (!selectedRequest) return { success: false, error: "No selected request" };
+  useEffect(() => {
+    const channel = supabase
+      .channel('donation-update-channel')
+      .on(
+        'postgres_changes',
+        { event: 'UPDATE', schema: 'public', table: 'donation' },
+        async (payload) => {
+          const updatedDonation = payload.new;
+          const donationId = updatedDonation.id;
+
+          if (updatedDonation.timer_trigger === false) {
+            // Invoke the edge function to cancel the timer
+            const { error } = await supabase.functions.invoke('failExpiredDonations', {
+              method: 'DELETE',
+              body: { donation_id: donationId },
+            });
+
+            if (error) {
+              console.error(`Failed to cancel the timer for donation ${donationId}:`, error);
+            } else {
+              console.log(`Timer for donation ${donationId} canceled.`);
+            }
+          }
+        }
+      )
+      .subscribe();
+
+    // Cleanup the subscription on unmount
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
+
+
+
+
+
+
+
+  const createDonation = async (): Promise<{
+    success: boolean;
+    error?: string;
+  }> => {
+    if (!selectedRequest)
+      return { success: false, error: "No selected request" };
 
     try {
-      const { data: donorProfile, error: donorError } = await supabase.auth.getUser();
-      if (donorError || !donorProfile.user) throw new Error("Donor not authenticated");
+      const { data: donorProfile, error: donorError } =
+        await supabase.auth.getUser();
+      if (donorError || !donorProfile.user)
+        throw new Error("Donor not authenticated");
 
       const { id: donor_ID } = donorProfile.user;
-      const { beneficiary_ID, donation_request_id: donationRequest_ID } = selectedRequest;
+      const { beneficiary_ID, donation_request_id: donationRequest_ID } =
+        selectedRequest;
 
       // 1. Insert into the donation table
       const { data: donationData, error: donationError } = await supabase
@@ -64,14 +107,21 @@ export const DonorProvider: React.FC<DonorProviderProps> = ({ children }) => {
             beneficiary_ID,
             donationRequest_ID,
             status: "PENDING",
+            timer_trigger: true, // Optionally set the timer_trigger to true initially
+
           },
         ])
         .select()
         .single();
 
       if (donationError || !donationData) {
-        console.log(donationError, "Donation creation failed ....donationError");
+        console.log(
+          donationError,
+          "Donation creation failed ....donationError"
+        );
         return { success: false, error: "Failed to create donation" };
+      } else {
+        console.log("Donation created successfully", donationData.id);
       }
 
       const donation_ID = donationData.id;
@@ -98,8 +148,14 @@ export const DonorProvider: React.FC<DonorProviderProps> = ({ children }) => {
         .eq("id", donationRequest_ID);
 
       if (donationRequestError) {
-        console.log("Failed to update donationRequest status", donationRequestError);
-        return { success: false, error: "Failed to update donation request status" };
+        console.log(
+          "Failed to update donationRequest status",
+          donationRequestError
+        );
+        return {
+          success: false,
+          error: "Failed to update donation request status",
+        };
       }
 
       // 4. Update the selected items' status to "PENDING"
@@ -113,6 +169,16 @@ export const DonorProvider: React.FC<DonorProviderProps> = ({ children }) => {
         return { success: false, error: "Failed to update item status" };
       }
 
+
+         const { error: edgeFunctionError } = await supabase.functions.invoke('failExpiredDonations', {
+      method: 'POST',
+      body: { donation_id: donation_ID },
+    });
+
+    if (edgeFunctionError) {
+      console.log("Failed to start timer in edge function", edgeFunctionError);
+      return { success: false, error: "Failed to start timer" };
+    }
       // Reset selected items after successful donation
       setSelectedItems([]);
 
@@ -122,7 +188,6 @@ export const DonorProvider: React.FC<DonorProviderProps> = ({ children }) => {
       return { success: false, error: String(error) };
     }
   };
-
 
   return (
     <DonationContext.Provider
@@ -135,7 +200,7 @@ export const DonorProvider: React.FC<DonorProviderProps> = ({ children }) => {
         setItems,
         donation,
         setDonation,
-        createDonation // Added setDonation to the provider value
+        createDonation, // Added setDonation to the provider value
       }}
     >
       {children}

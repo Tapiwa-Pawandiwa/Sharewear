@@ -14,7 +14,7 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { supabase } from "@/lib/supabase";
 import RemoteImage from "@/components/RemoteImage";
 import { useQuery } from "react-query";
-import {Tables} from "@/app/database.types";
+import { Tables } from "@/app/database.types";
 import { useDonationRequestsWithCategory } from "@/app/hooks/useDonationRequests";
 import Colors from "@/constants/Colors";
 import { Image } from "expo-image";
