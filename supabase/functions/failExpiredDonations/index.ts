@@ -100,11 +100,6 @@ serve(async (req) => {
           .eq("id", donation_id);
 
         await supabase
-          .from("donationRequest")
-          .update({ status: "AVAILABLE" })
-          .eq("id", donation.donationRequest_ID);
-
-        await supabase
           .from("item")
           .update({ status: "AVAILABLE" })
           .eq("donationRequest_ID", donation.donationRequest_ID);
