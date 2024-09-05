@@ -3,30 +3,24 @@ import {
   View,
   StyleSheet,
   Text,
-  Pressable,
-  ActivityIndicator,
   FlatList,
   ScrollView,
 } from "react-native";
-import RoundedButton from "@/components/RoundedButton";
 import Carousel from "react-native-reanimated-carousel";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { supabase } from "@/lib/supabase";
 import RemoteImage from "@/components/RemoteImage";
 import { useQuery } from "react-query";
 import { Tables } from "@/app/database.types";
-import { useDonationRequestsWithCategory } from "@/app/hooks/useDonationRequests";
+import { useDonationRequestsWithCategory } from "@/app/hooks/useDonation";
 import Colors from "@/constants/Colors";
 import { Image } from "expo-image";
 import BackButton from "@/components/BackButton";
-import { useItems } from "@/app/hooks/useDonationRequests";
+import { useItems } from "@/app/hooks/useDonation";
 import SlideButton from "@/components/SlideButton";
 import Item from "@/components/Item";
 import { useDonorContext } from "@/app/providers/Donor";
 import { CustomAlertModal } from '@/components/CustomAlertModal';
-
-
-
 
 type ItemType = {
   id: number;

@@ -6,7 +6,7 @@ import Colors from "@/constants/Colors";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/app/providers/Auth";
 import { useEffect, useState } from "react";
-import { useDonationRequestsWithCategoryAndTagsByProfile } from "@/app/hooks/useDonationRequests";
+import { useDonationRequestsWithCategoryAndTagsByProfile } from "@/app/hooks/useDonation";
 import Carousel from "react-native-reanimated-carousel";
 import RemoteImage from "@/components/RemoteImage";
 import FilterChipList from "@/components/FilterChipList";

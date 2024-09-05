@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text , FlatList,StyleSheet} from 'react-native';
 
-import { useCategories, useDonationRequests } from '@/app/hooks/useDonationRequests';
+import { useCategories, useDonationRequests } from '@/app/hooks/useDonation';
 import CategoryChip from './CategoryChip';
 
 type CategoryListProps = {

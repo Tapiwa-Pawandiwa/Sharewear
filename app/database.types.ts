@@ -74,6 +74,13 @@ export type Database = {
             foreignKeyName: "donation_donationRequest_ID_fkey"
             columns: ["donationRequest_ID"]
             isOneToOne: false
+            referencedRelation: "donation_with_details"
+            referencedColumns: ["donationRequest_ID"]
+          },
+          {
+            foreignKeyName: "donation_donationRequest_ID_fkey"
+            columns: ["donationRequest_ID"]
+            isOneToOne: false
             referencedRelation: "donationRequest"
             referencedColumns: ["id"]
           },
@@ -111,6 +118,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "donation_items_donation_ID_fkey"
+            columns: ["donation_ID"]
+            isOneToOne: false
+            referencedRelation: "donation_with_details"
+            referencedColumns: ["donation_id"]
+          },
+          {
             foreignKeyName: "donation_items_item_ID_fkey"
             columns: ["item_ID"]
             isOneToOne: false
@@ -142,6 +156,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "donation_requests_with_categories_and_tags"
             referencedColumns: ["donation_request_id"]
+          },
+          {
+            foreignKeyName: "donation_request_tags_donationRequest_ID_fkey"
+            columns: ["donationRequest_ID"]
+            isOneToOne: false
+            referencedRelation: "donation_with_details"
+            referencedColumns: ["donationRequest_ID"]
           },
           {
             foreignKeyName: "donation_request_tags_donationRequest_ID_fkey"
@@ -194,6 +215,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "donation"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "donation_timers_donation_id_fkey"
+            columns: ["donation_id"]
+            isOneToOne: false
+            referencedRelation: "donation_with_details"
+            referencedColumns: ["donation_id"]
           },
         ]
       }
@@ -290,6 +318,13 @@ export type Database = {
             foreignKeyName: "images_donationRequest_ID_fkey"
             columns: ["donationRequest_ID"]
             isOneToOne: false
+            referencedRelation: "donation_with_details"
+            referencedColumns: ["donationRequest_ID"]
+          },
+          {
+            foreignKeyName: "images_donationRequest_ID_fkey"
+            columns: ["donationRequest_ID"]
+            isOneToOne: false
             referencedRelation: "donationRequest"
             referencedColumns: ["id"]
           },
@@ -347,6 +382,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "donation_requests_with_categories_and_tags"
             referencedColumns: ["donation_request_id"]
+          },
+          {
+            foreignKeyName: "item_donationRequest_ID_fkey"
+            columns: ["donationRequest_ID"]
+            isOneToOne: false
+            referencedRelation: "donation_with_details"
+            referencedColumns: ["donationRequest_ID"]
           },
           {
             foreignKeyName: "item_donationRequest_ID_fkey"
@@ -478,6 +520,39 @@ export type Database = {
           },
         ]
       }
+      donation_with_details: {
+        Row: {
+          beneficiary_ID: string | null
+          donation_id: number | null
+          donation_request_address: string | null
+          donation_request_headline: string | null
+          donation_status: Database["public"]["Enums"]["status"] | null
+          donationRequest_ID: number | null
+          donor_ID: string | null
+          expiration_time: string | null
+          images: string[] | null
+          item_name: string | null
+          item_status: Database["public"]["Enums"]["status"] | null
+          timer_canceled: boolean | null
+          timer_start_time: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "donation_beneficiary_ID_fkey"
+            columns: ["beneficiary_ID"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "donation_donor_ID_fkey"
+            columns: ["donor_ID"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       get_secret: {
@@ -489,6 +564,12 @@ export type Database = {
           secret_name: string
         }
         Returns: string
+      }
+      update_donation_request_status: {
+        Args: {
+          donation_request_id: number
+        }
+        Returns: undefined
       }
     }
     Enums: {

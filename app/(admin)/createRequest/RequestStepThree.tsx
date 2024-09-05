@@ -14,7 +14,6 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { Modal } from 'react-native';
 import { Status } from '@/app/providers/Form';
 import { CustomAlertModal } from '@/components/CustomAlertModal';
-import Icons from '../../../assets/Assets';
 
 
 

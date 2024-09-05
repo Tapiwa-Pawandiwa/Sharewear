@@ -22,24 +22,26 @@ export default function TabLayout() {
 
   return (
     <Tabs
-      screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
-        headerShown: useClientOnlyValue(false, true),
-        tabBarShowLabel: false,
-        tabBarStyle: {
-          position: "absolute",
-          bottom: 25,
-          left: 20,
-          right: 20,
-          elevation: 0,
-          shadowColor: Colors.dark.background,
-          shadowOffset: { width: 1, height: 10 },
-          shadowOpacity: 0.2,
-          shadowRadius: 20,
-          borderRadius: 35,
-          backgroundColor: Colors.light.background,
-          height: 70,
-        },
+    screenOptions={{
+      tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
+      headerShown: useClientOnlyValue(false, true),
+      tabBarShowLabel: false, // Ensure label is shown
+      tabBarLabelPosition: 'below-icon', // Force the label to be displayed below the icon
+      tabBarStyle: {
+        position: "absolute",
+        bottom: 20,
+        left: 20,
+        right: 20,
+        elevation: 0,
+        shadowColor: Colors.dark.background,
+        shadowOffset: { width: 1, height: 10 },
+        shadowOpacity: 0.2,
+        shadowRadius: 20,
+        borderRadius: 40,
+        backgroundColor: Colors.light.background,
+        height: 85, // Ensure enough height for both the icon and label
+      },
+   
       }}
     >
       <Tabs.Screen
@@ -47,10 +49,9 @@ export default function TabLayout() {
         options={{
           title: "Home",
           headerShown: false,
-
           tabBarActiveTintColor: Colors.green.main,
           tabBarIcon: ({ focused }) => (
-            <TabIcon name="home" focused={focused} library="FontAwesome" />
+            <TabIcon name="home" focused={focused} library="FontAwesome" label="Home" />
           ),
           headerRight: () => (
             <Link href="/modal" asChild>
@@ -75,7 +76,7 @@ export default function TabLayout() {
           headerShown: false,
           tabBarActiveTintColor: Colors.green.main,
           tabBarIcon: ({ focused }) => (
-            <TabIcon name="box-open" focused={focused} library="FontAwesome5" />
+            <TabIcon name="box-open" focused={focused} library="FontAwesome5"  label="My Donations"/>
           ),
         }}
       />
@@ -86,7 +87,7 @@ export default function TabLayout() {
           headerShown: false,
           tabBarActiveTintColor: Colors.green.main,
           tabBarIcon: ({ focused }) => (
-            <TabIcon name="location" focused={focused} library="Entypo" />
+            <TabIcon name="location" focused={focused} library="Entypo" label="Near Me" />
           ),
         }}
       />
@@ -97,7 +98,7 @@ export default function TabLayout() {
           headerShown: false,
           tabBarActiveTintColor: Colors.green.main,
           tabBarIcon: ({ focused }) => (
-            <TabIcon name="user" focused={focused} library="FontAwesome5" />
+            <TabIcon name="user" focused={focused} library="FontAwesome5" label="Profile"  />
           ),
         }}
       />

@@ -1,8 +1,6 @@
 import { useAuth } from '@/app/providers/Auth';
-import CategoryChip from '@/components/user/CategoryChip';
 import CategoryList from '@/components/user/CategoryList';
-import DonationCard from '@/components/user/DonationCard';
-import DonationList from '@/components/user/DonationList';
+import DonationRequestList from '@/components/user/DonationRequestList';
 import Colors from '@/constants/Colors';
 import { Redirect } from 'expo-router';
 import React, { useState } from 'react'
@@ -29,10 +27,10 @@ const index = () => {
     <SafeAreaView style={styles.container}>
         <Text style={styles.mainName}>Hi, <Text style={styles.name}>{profile?.first_name} </Text></Text>
       <Text style={styles.label}>Latest Near you...</Text>
-       <DonationList/>
+       <DonationRequestList/>
        <Text style={styles.label}>Categories</Text>
        <CategoryList onCategorySelect={setSelectedCategoryId}/>
-       <DonationList categoryId={selectedCategoryId}/>
+       <DonationRequestList categoryId={selectedCategoryId}/>
     </SafeAreaView>
   )
 }

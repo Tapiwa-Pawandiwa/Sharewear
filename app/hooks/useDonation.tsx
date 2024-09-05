@@ -4,7 +4,7 @@ import {Alert} from 'react-native';
 import { useState } from 'react';
 import { useAuth } from '../providers/Auth';
 import * as FileSystem from 'expo-file-system';
-import { Tables } from '../database.types';
+import { Tables } from '@/app/database.types';
 
 /* Types */
 
@@ -12,11 +12,56 @@ type DonationRequest = Tables<'donationRequest'>;
 type DonationRequestWithCategoryAndTags = Tables<'donation_requests_with_categories_and_tags'>;
 type Categories = Tables<'category'>;
 type Item = Tables<'item'>;
+type Donation = Tables<'donation'>;
+type DonationWithDetails = Tables<'donation_with_details'>;
 
 
 
 /* DONOR HOOKS */
 
+const fetchDonationWithDetails = async (): Promise<DonationWithDetails[]> => {
+    const { data, error } = await supabase
+        .from('donation_with_details')
+        .select('*');
+
+    if (error) {
+        throw error;
+    }
+
+    if (!data) {
+        return []; // Return an empty array if no data
+    }
+
+    // Process images for each donation
+    const donationsWithCachedImages = await Promise.all(
+        data.map(async (donation) => {
+            // Cache all images
+            const cachedImages = await Promise.all(
+                (donation.images || []).map(async (path: string) => {
+                    const cachedImage = await getCachedImage(path);
+                    return cachedImage;
+                })
+            );
+
+            // Return donation with cached images
+            return { ...donation, images: cachedImages };
+        })
+    );
+
+    return donationsWithCachedImages;
+};
+
+const fetchDonations = async (): Promise<Donation[]> => {
+    const { data, error } = await supabase
+        .from('donation')
+        .select('*');
+
+    if (error) {
+        throw error;
+    }
+
+    return data || [];
+}
 
 const fetchItems = async (): Promise<Item[]> => {
     const {data,error } = await supabase.from ('item').select('*');
@@ -51,6 +96,7 @@ const fetchCategories = async (): Promise<Categories[]> => {
     return data || [];
 
 }
+
 
 
 const fetchDonationRequestsWithCategory = async (): Promise<DonationRequestWithCategoryAndTags[]> => {
@@ -168,6 +214,12 @@ const fetchDonationRequestsWithCategoryAndTagsPerProfile = async (profileId: str
 
   ///-----------------------------------//
 
+export const useDonationWithDetails = () => {
+    return useQuery('donationWithDetails', fetchDonationWithDetails);
+}
+  export const useDonations = () => {
+    return useQuery('donations', fetchDonations);
+}
 export const useItems = () => {
     return useQuery('items', fetchItems);
 };

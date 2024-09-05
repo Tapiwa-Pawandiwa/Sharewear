@@ -4,12 +4,13 @@ import { FontAwesome5,FontAwesome ,Ionicons, Entypo, MaterialCommunityIcons,Mate
 import Colors from "@/constants/Colors";
 
 interface TabIconProps {
+  label: string;
   name: string;
   focused: boolean;
   library: 'FontAwesome' | 'FontAwesome5' | 'Ionicons' | 'MaterialIcons' | 'MaterialCommunityIcons' | 'AntDesign' | 'Entypo';
 }
 
-const TabIcon: React.FC<TabIconProps> = ({ name, focused ,library}) => {
+const TabIcon: React.FC<TabIconProps> = ({ name, focused ,library,label}) => {
     let IconComponent;
 
     switch (library) {
@@ -28,41 +29,32 @@ const TabIcon: React.FC<TabIconProps> = ({ name, focused ,library}) => {
     }
  
     return (
-        <View style={[
-            styles.tabItem,
-            focused ? styles.focusedTabItem : null
-          ]}>
-            <IconComponent
-              name={name}
-              size={25}
-              color={focused ? Colors.green.main : Colors.grey.light}
-              style={styles.icon}
-            />
-          </View>
-  );
+      <View style={[styles.container, focused ? styles.focusedContainer : null]}>
+      <IconComponent
+        name={name}
+        size={focused? 35 : 25}
+        color={focused ? Colors.green.main : Colors.grey.light}
+        style={styles.icon}
+      />
+      <Text style={[styles.labelText, focused ? styles.focusedlabel : null]}>
+        {label}
+      </Text>
+    </View>
+    );
 };
 
 const styles = StyleSheet.create({
-  tabView: {
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  tabIcon: {
-    marginBottom: 0,
-  },
-  tabItem: {
+  container: {
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: 35,
-    margin: 5,
-    padding: 5,
-    height: 50,
-    width: 60,
-    marginTop: 35
+    width: 80, 
+    marginTop: 30,
+    height: 80,
   },
-  tabText: {
-    fontSize: 10,
-    textAlign: "center",
+  focusedContainer: {
+    borderRadius: 50, // Ensures the background is circular
+    paddingVertical: 10, // Adds some padding to the top and bottom
+    paddingHorizontal: 20, // Adds some padding to the sides
   },
   focusedTabItem: {
     backgroundColor: Colors.green.alt,
@@ -73,8 +65,24 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   icon: {
-    marginBottom: -3,
+    marginBottom: 5,
   },
+  labelText: {
+    color: Colors.grey.light,
+    fontSize: 12,
+    fontFamily: 'Now-Regular',
+    textAlign: 'center',
+    width: 100,
+    justifyContent: 'center',
+    alignItems: 'center',
+  
+  },
+  focusedlabel: {
+    color: Colors.green.main,
+    fontSize: 14,
+    width: 100,
+  },
+
 });
 
 export default TabIcon;
