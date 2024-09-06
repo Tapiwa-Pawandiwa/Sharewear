@@ -67,8 +67,9 @@ const styles = StyleSheet.create({
   },
   timerText: {
     fontSize: 14,
-    fontWeight: 'bold',
-    color: '#ff0000', // Red for urgency
+    
+    color: '#A00505',
     fontFamily: 'Now-Bold',
+    opacity: 1,
   },
 });

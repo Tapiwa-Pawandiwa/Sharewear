@@ -14,7 +14,7 @@ interface DonationCardProps {
   }
 
 const DonationCard: React.FC<DonationCardProps> = ({ donation }) => {
-    const { donation_request_headline, donation_request_address, images,timer_start_time } = donation;
+    const { donation_request_headline, donation_status, donation_request_address, images,timer_start_time } = donation;
 
 
 
@@ -37,15 +37,17 @@ const DonationCard: React.FC<DonationCardProps> = ({ donation }) => {
       </View>
       <View style={styles.timeContainer}>
         <Image style={styles.timeImage} source={require('@/assets/icons/time.png')} />
-        <Text style={styles.timeText}>
-       
-        </Text>
+ 
         {timer_start_time ? (
           <CountdownTimer createdTime={timer_start_time} />
         ) : (
           <Text style={styles.timeText}>No timer</Text>
         )}
-        <RoundedButton title="Abort Donation" buttonStyle={styles.abort} textStyle={styles.buttonText} />
+        {
+            donation_status === 'PENDING' && (
+              <RoundedButton title="Abort Donation" buttonStyle={styles.abort} textStyle={styles.buttonText} />
+            )
+        }
       </View>
     </View>
   )
@@ -76,7 +78,7 @@ const styles = StyleSheet.create({
             margin: 10
         },
         timeImage:{
-            width: 30,
+            width: 45,
             height: 30,
             marginRight: 5
         },
@@ -99,7 +101,7 @@ const styles = StyleSheet.create({
             width: 100,
         },
         abort:{
-            backgroundColor: Colors.red.hard,
+            backgroundColor: '#A00505',
             width: 120,
             height: 35,
             borderRadius: 20,
@@ -111,8 +113,6 @@ const styles = StyleSheet.create({
             color: 'white',
             fontSize: 12,
             fontFamily: 'Helvetica',
-
-
         }
 
 })

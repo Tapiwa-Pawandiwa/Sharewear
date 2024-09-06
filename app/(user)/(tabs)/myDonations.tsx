@@ -1,4 +1,3 @@
-
 import DonationList from "@/components/user/DonationList";
 import Colors from "@/constants/Colors";
 import React from "react";
@@ -14,14 +13,11 @@ const myDonations = () => {
             style={styles.headImage}
           />
           <Text style={styles.heading}>My Donations</Text>
-
         </View>
       </View>
-     <View style={styles.listContainer}>
-            <DonationList />
-     </View>
-
-
+      <View style={styles.listContainer}>
+        <DonationList />
+      </View>
     </View>
   );
 };
@@ -39,7 +35,7 @@ const styles = StyleSheet.create({
     width: "95%",
     marginTop: 20,
     marginLeft: 10,
-    marginBottom: 20,
+ 
     padding: 15,
   },
   innerContainer: {
@@ -49,17 +45,17 @@ const styles = StyleSheet.create({
     marginTop: 30,
     alignSelf: "center",
   },
-  
+
   heading: {
     fontSize: 30,
     fontFamily: "LeagueSpartan-Regular",
   },
-  headImage: { 
+  headImage: {
     width: 100,
-     height: 100,
-     },
-     listContainer:{
-       alignItems: 'center',
-        justifyContent: 'center',
-     },
+    height: 100,
+  },
+  listContainer: {
+    alignItems: "center",
+    justifyContent: "center",
+  },
 });

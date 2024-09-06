@@ -57,15 +57,16 @@ const styles = StyleSheet.create({
   },
   chipText: {
     color: "black",
-    fontSize: 12,
+    fontSize: 14,
+    fontFamily: "Now-Regular",
   },
   selectedChipText: {
     color: "white",
   },
   unselectedChip: {
     backgroundColor: "white",
-    borderWidth: 0.5,
-    borderColor: "grey",
+
+   
   },
   unselectedChipText: {
     color: "black",
