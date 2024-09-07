@@ -14,7 +14,7 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.tapiwap.Sharewear"
+      "bundleIdentifier": "com.tapiwap.Sharewear",
     },
     "android": {
       "adaptiveIcon": {

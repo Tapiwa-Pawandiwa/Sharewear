@@ -1,6 +1,7 @@
 import { supabase } from "@/lib/supabase";
 import { Callback } from "@react-native-async-storage/async-storage/lib/typescript/types";
 import { Session, User } from "@supabase/supabase-js";
+import { router } from "expo-router";
 import {
   useContext,
   createContext,
@@ -17,6 +18,8 @@ type AuthData = {
         first_name: string;
         last_name: string;
         user_type: string;
+        phone_number: string;
+        email: string;
     } | null;
     isAdmin: boolean;
     signUserOut: () => Promise<void>;
@@ -76,6 +79,7 @@ export default function AuthProvider({ children }: PropsWithChildren) {
         setProfile(null); // Clear profile state
         setSession(null); // Clear session state
         setUser(null);    // Clear user state
+        router.replace('/(auth)/sign-in');
       } catch (e: any) {
         console.log('Sign out failed', e);
       }
@@ -85,7 +89,7 @@ export default function AuthProvider({ children }: PropsWithChildren) {
       if (session) {
         const { data, error } = await supabase
           .from('profiles')
-          .select('id,first_name,last_name,user_type')
+          .select('id,first_name,last_name,user_type,phone_number,email')
           .eq('id', session?.user.id)
           .single();
         if (error) {

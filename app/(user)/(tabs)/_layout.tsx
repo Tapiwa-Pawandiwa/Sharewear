@@ -98,7 +98,7 @@ export default function TabLayout() {
           headerShown: false,
           tabBarActiveTintColor: Colors.green.main,
           tabBarIcon: ({ focused }) => (
-            <TabIcon name="user" focused={focused} library="FontAwesome5" label="Profile"  />
+            <TabIcon name="user" focused={focused} library="FontAwesome" label="Profile"  />
           ),
         }}
       />

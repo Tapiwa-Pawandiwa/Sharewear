@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { View, Text, FlatList, StyleSheet } from "react-native";
-import { useDonationWithDetails } from "@/app/hooks/useDonation";
+import { useDonationsByDonor, useDonationWithDetails } from "@/app/hooks/useDonation";
 import { Tables } from "@/app/database.types";
 import DonationCard from "./DonationCard";
 import CategoryChip from "./CategoryChip";
@@ -9,7 +9,7 @@ import FilterChip from "../FilterChip";
 type DonationWithDetails = Tables<"donation_with_details">;
 
 const DonationList: React.FC = () => {
-  const { data: donationsWithDetails, isLoading } = useDonationWithDetails();
+  const { data: donationsWithDetails, isLoading } = useDonationsByDonor();
   const [selectedStatus, setSelectedStatus] = useState<string>("ALL");
 
   const filterDonations = (donations: DonationWithDetails[]) => {

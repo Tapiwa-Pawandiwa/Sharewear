@@ -3,7 +3,7 @@ import React, { useState } from 'react'
 import FilterChip from './FilterChip';
 
 
-const filterOptions = ['All', 'Available', 'Pending', 'Complete'];
+const filterOptions = ['All', 'Available', 'Pending', 'Complete', 'Failed'];
 
 type FilterChipListProps = {
   onFilterChange?: (filter: string) => void; // Optional prop
@@ -30,8 +30,8 @@ export default function FilterChipList({ onFilterChange }: FilterChipListProps) 
       <FilterChip
         name={item}
         isSelected={item === selectedFilter}
-        onPress={()=>handlePress}
-      />
+        onPress={() => handlePress(item)} // Correctly invoke handlePress
+        />
     )}
     contentContainerStyle={styles.container}
     showsHorizontalScrollIndicator={false}

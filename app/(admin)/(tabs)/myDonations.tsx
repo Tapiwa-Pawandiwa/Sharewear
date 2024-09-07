@@ -16,7 +16,7 @@ import { useDonationRequestsByBeneficiary, useDonationsByRequest } from "@/app/h
 type DonationRequest = Tables<'donationRequest'>;
 type Donation = Tables<'donation'>;
 
-export default function TabTwoScreen() {
+export default function myDonations() {
   const { data: donationRequests, isLoading: loadingRequests } = useDonationRequestsByBeneficiary();
   const requestIds = donationRequests?.map(request => request.id) || [];
   const { data: donations, isLoading: loadingDonations } = useDonationsByRequest(requestIds);

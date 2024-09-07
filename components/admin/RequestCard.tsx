@@ -5,35 +5,33 @@ import Colors from '@/constants/Colors';
 import RemoteImage from '../RemoteImage';
 
 interface RequestCardProps {
-    description : string;
-    location: string;
-    items: number;
-    from: string;
-    image: string;
-    time: string;
+  headline: string;
+  location: string;
+  status: string;
+  description: string;
+  items: number;
+  image: string;
+  onManage: () => void; 
 }
 
-const RequestCard:React.FC<RequestCardProps> = ({description,location,items,from,image,time}) => {
+const RequestCard:React.FC<RequestCardProps> = ({ headline, location, status, description, items, image, onManage }) => {
   const handleManage = () => {
     console.log('Manage Request');
     }
   //Add max quanity for the amount of characters in the description 
     return (
-  <View style={styles.container}>
-    <RemoteImage style={styles.image} 
-    path={image}
-    fallback={'https://via.placeholder.com/200'}
-    />
-    <View style={styles.heading}>
-        <Text style={styles.descriptionStyle}>{description}</Text>
+      <View style={styles.container}>
+      <RemoteImage style={styles.image} path={image} fallback={'https://via.placeholder.com/200'} />
+      <View style={styles.heading}>
+        <Text style={styles.headlineStyle}>{headline}</Text>
         <Text style={styles.locationStyle}>{location}</Text>
+        <Text style={styles.statusStyle}>Status: {status}</Text>
         <Text style={styles.itemStyle}>{items} Items</Text>
+      </View>
+      <View style={styles.rightContainer}>
+        <RoundedButton title="Manage" buttonStyle={styles.requestButton} textStyle={styles.buttonText} onPress={onManage} />
+      </View>
     </View>
-    <View style={styles.rightContainer}>
-        <Text>{time}</Text>
-        <RoundedButton title='Manage' buttonStyle={styles.requestButton} textStyle={styles.buttonText} onPress={handleManage}/>
-    </View>
-  </View>
   )
 }
 
@@ -42,7 +40,7 @@ export default RequestCard;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    height: 110,
+    height: 140,
     padding: 5,
     flexDirection: 'row',
     width: '92%',
@@ -56,6 +54,15 @@ const styles = StyleSheet.create({
     marginTop: 15,
     marginLeft: 10,
     maxWidth: 150
+  },
+  headlineStyle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 5,
+  },statusStyle: {
+    fontSize: 12,
+    color: 'blue',
+    marginBottom: 5,
   },
     descriptionStyle: {
         fontSize: 16,
@@ -88,7 +95,7 @@ const styles = StyleSheet.create({
         height: 30,
         justifyContent: 'center',
         alignContent: 'center',
-        marginRight: 10,
+        marginRight: 15,
 
     },
     buttonText: {
@@ -99,5 +106,7 @@ const styles = StyleSheet.create({
     rightContainer:{
         alignItems: 'center',
         alignSelf: 'center',
+        marginTop: 50,
+        
     }
 });

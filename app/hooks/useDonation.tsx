@@ -182,11 +182,73 @@ const getCachedImage = async (path: string): Promise<string | null> => {
 };
 
 
+const fetchDonationsByDonors = async (profileId: string): Promise<DonationWithDetails[]> => {
+    const { data, error } = await supabase
+        .from('donation_with_details')
+        .select('*')
+        .eq('donor_ID', profileId);
+
+    if (error) {
+        throw error;
+    }
+
+    if (!data) {
+        return [];
+    }
+
+    // Process images as before
+    const donationsWithCachedImages = await Promise.all(
+        data.map(async (donation) => {
+            const cachedImages = await Promise.all(
+                (donation.images || []).map(async (path: string) => {
+                    const cachedImage = await getCachedImage(path);
+                    return cachedImage;
+                })
+            );
+
+            return { ...donation, images: cachedImages };
+        })
+    );
+
+    return donationsWithCachedImages;
+};
+
+
+const fetchDonationsByBeneficiary = async (profileId: string): Promise<DonationWithDetails[]> => {
+    const { data, error } = await supabase
+        .from('donation_with_details')
+        .select('*')
+        .eq('beneficiary_ID', profileId);
+
+    if (error) {
+        throw error;
+    }
+
+    if (!data) {
+        return [];
+    }
+
+    // Process images as before
+    const donationsWithCachedImages = await Promise.all(
+        data.map(async (donation) => {
+            const cachedImages = await Promise.all(
+                (donation.images || []).map(async (path: string) => {
+                    const cachedImage = await getCachedImage(path);
+                    return cachedImage;
+                })
+            );
+
+            return { ...donation, images: cachedImages };
+        })
+    );
+
+    return donationsWithCachedImages;
+};
 
 
 /* ADMIN HOOKS*/
 
-const fetchDonationRequestsPerProfile = async (profileId: string): Promise<DonationRequest[]> => {
+const fetchDonationRequestsByBeneficiary = async (profileId: string): Promise<DonationRequest[]> => {
     const { data, error } = await supabase
         .from('donationRequest')
         .select('*')
@@ -199,7 +261,8 @@ const fetchDonationRequestsPerProfile = async (profileId: string): Promise<Donat
     return data || [];
 };
 
-const fetchDonationRequestsWithCategoryAndTagsPerProfile = async (profileId: string): Promise<DonationRequestWithCategoryAndTags[]> => {
+
+const fetchDonationRequestsWithCategoryAndTagsByBeneficiary = async (profileId: string): Promise<DonationRequestWithCategoryAndTags[]> => {
     const { data, error } = await supabase
         .from('donation_requests_with_categories_and_tags')
         .select('*')
@@ -211,8 +274,66 @@ const fetchDonationRequestsWithCategoryAndTagsPerProfile = async (profileId: str
     
     return data || [];
 };
+const fetchDonationsByRequest = async (requestIds: number[]): Promise<Donation[]> => {
+    const { data, error } = await supabase
+        .from('donation')
+        .select('*')
+        .in('donationRequest_ID', requestIds); // Fetching donations for the request IDs
 
+    if (error) {
+        throw error;
+    }
+
+    return data || [];
+}
+
+const fetchItemsByDonation = async (donationId: number): Promise<Item[]> => {
+    const { data, error } = await supabase
+        .from('item')
+        .select('*')
+        .eq('donation_ID', donationId);
+
+    if (error) {
+        throw error;
+    }
+
+    return data || [];
+}
   ///-----------------------------------//
+export const useItemsByDonation = (donationId: number) => {
+    return useQuery(['itemsByDonation', donationId], () => fetchItemsByDonation(donationId), {
+        enabled: donationId != null, // Only run if donationId exists
+      });
+}
+
+
+  
+export const useDonationsByRequest = (requestIds: number[]) => {
+    return useQuery(['donationsByRequest', requestIds], () => fetchDonationsByRequest(requestIds), {
+        enabled: requestIds.length > 0, // Only run if there are request IDs
+      });}
+
+export const useDonationByBeneficiary = () => {
+    const { profile } = useAuth();
+
+    if (!profile?.id) {
+        throw new Error('User is not authenticated or profile ID is missing');
+    }
+    return useQuery(['donationsByBeneficiary', profile.id], () => fetchDonationsByBeneficiary(profile.id));
+}
+
+export const useDonationsByDonor = () => {
+    const { profile } = useAuth();
+
+    if (!profile?.id) {
+        throw new Error('User is not authenticated or profile ID is missing');
+    }
+
+    return useQuery(['donationsByDonor', profile.id], () => fetchDonationsByDonors(profile.id));
+}
+    
+
+
 
 export const useDonationWithDetails = () => {
     return useQuery('donationWithDetails', fetchDonationWithDetails);
@@ -234,7 +355,7 @@ export const useDonationRequestsWithCategory = () => {
     return useQuery('donationRequestsWithCategory', fetchDonationRequestsWithCategory);
 }
 
-export const useDonationRequestsByProfile = () => {
+export const useDonationRequestsByBeneficiary = () => {
     const { profile } = useAuth(); // Extract profile from useAuth
 
     // Ensure profile is available before fetching
@@ -242,7 +363,7 @@ export const useDonationRequestsByProfile = () => {
         throw new Error('User is not authenticated or profile ID is missing');
     }
 
-    return useQuery(['donationRequests', profile.id], () => fetchDonationRequestsPerProfile(profile.id));
+    return useQuery(['donationRequests', profile.id], () => fetchDonationRequestsByBeneficiary(profile.id));
 };
 export const useDonationRequestsWithCategoryAndTagsByProfile = () => {
     const { profile } = useAuth();
@@ -251,5 +372,5 @@ export const useDonationRequestsWithCategoryAndTagsByProfile = () => {
         throw new Error('User is not authenticated or profile ID is missing');
     }
 
-    return useQuery(['donationRequestsWithCategoryAndTags', profile.id], () => fetchDonationRequestsWithCategoryAndTagsPerProfile(profile.id));
+    return useQuery(['donationRequestsWithCategoryAndTags', profile.id], () => fetchDonationRequestsWithCategoryAndTagsByBeneficiary(profile.id));
 };

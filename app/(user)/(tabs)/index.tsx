@@ -26,7 +26,7 @@ const index = () => {
   return (
     <SafeAreaView style={styles.container}>
         <Text style={styles.mainName}>Hi, <Text style={styles.name}>{profile?.first_name} </Text></Text>
-      <Text style={styles.label}>Latest Near you...</Text>
+      <Text style={styles.label}>Latest Requests for you...</Text>
        <DonationRequestList/>
        <Text style={styles.label}>Categories</Text>
        <CategoryList onCategorySelect={setSelectedCategoryId}/>
