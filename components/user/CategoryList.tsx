@@ -23,8 +23,6 @@ const CategoryList:React.FC<CategoryListProps> = ({onCategorySelect}) => {
     onCategorySelect(newSelectedCategoryId);
   };
 
-
-
   if (isLoading) {
     return <Text>Loading...</Text>; // Add a loading indicator or message
   }

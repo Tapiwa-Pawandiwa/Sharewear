@@ -19,7 +19,6 @@ import { useAuth } from "@/app/providers/Auth";
 const ItemAdder: React.FC = () => {
   const [text, onChangeText] = useState("");
   const [quantity, setQuantity] = useState(1);
-  const [data, setData] = useState([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
   const { formData, updateFormData, removeItem, addItem } = useFormContext();

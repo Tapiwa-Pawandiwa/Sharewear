@@ -227,7 +227,6 @@ const fetchDonationsByBeneficiary = async (profileId: string): Promise<DonationW
     if (!data) {
         return [];
     }
-
     // Process images as before
     const donationsWithCachedImages = await Promise.all(
         data.map(async (donation) => {
@@ -248,17 +247,33 @@ const fetchDonationsByBeneficiary = async (profileId: string): Promise<DonationW
 
 /* ADMIN HOOKS*/
 
-const fetchDonationRequestsByBeneficiary = async (profileId: string): Promise<DonationRequest[]> => {
+const fetchDonationRequestsByBeneficiary = async (profileId: string): Promise<DonationRequestWithCategoryAndTags[]> => {
     const { data, error } = await supabase
-        .from('donationRequest')
+        .from('donation_requests_with_categories_and_tags')
         .select('*')
         .eq('beneficiary_ID', profileId);
 
     if (error) {
         throw error;
     }
+    const donationRequestWithCachedImages = await Promise.all(
+        data.map(async (request) => {
+            // Cache all images
+            const cachedImages = await Promise.all(
+                (request.images || []).map(async (path: string) => {
+                    const cachedImage = await getCachedImage(path);
+                    return cachedImage;
+                })
+            );
+
+            // Return donation with cached images
+            return { ...request, images: cachedImages };
+        })
+    );
+
+    return donationRequestWithCachedImages;
     
-    return data || [];
+
 };
 
 
@@ -287,25 +302,25 @@ const fetchDonationsByRequest = async (requestIds: number[]): Promise<Donation[]
     return data || [];
 }
 
-const fetchItemsByDonation = async (donationId: number): Promise<Item[]> => {
+const fetchItemsByDonation = async (itemIds: number[]): Promise<Item[]> => {
     const { data, error } = await supabase
         .from('item')
         .select('*')
-        .eq('donation_ID', donationId);
+        .in('id', itemIds);  // Fetching based on item IDs
 
     if (error) {
         throw error;
     }
 
     return data || [];
-}
-  ///-----------------------------------//
-export const useItemsByDonation = (donationId: number) => {
-    return useQuery(['itemsByDonation', donationId], () => fetchItemsByDonation(donationId), {
-        enabled: donationId != null, // Only run if donationId exists
-      });
-}
+};
 
+// React Query hook to fetch items by multiple donation IDs
+export const useItemsByDonation = (itemIds: number[]) => {
+    return useQuery(['itemsByDonation', itemIds], () => fetchItemsByDonation(itemIds), {
+        enabled: !!itemIds.length,  // Only run if itemIds array is not empty
+    });
+};
 
   
 export const useDonationsByRequest = (requestIds: number[]) => {

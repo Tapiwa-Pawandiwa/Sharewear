@@ -18,18 +18,11 @@ import { Image } from "expo-image";
 import BackButton from "@/components/BackButton";
 import { useItems } from "@/app/hooks/useDonation";
 import SlideButton from "@/components/SlideButton";
-import Item from "@/components/Item";
 import { useDonorContext } from "@/app/providers/Donor";
 import { CustomAlertModal } from '@/components/CustomAlertModal';
+import Item from "@/components/Item";
 
-type ItemType = {
-  id: number;
-  name: string;
-  quantity: number;
-  status: 'AVAILABLE' | 'PENDING' | 'COMPLETE' | null; // Union type
-  donationRequest_ID: number | null;
-};
-
+type ItemType = Tables<'item'>;
 
 export default function donationRequest() {
   const router = useRouter();
@@ -161,6 +154,7 @@ export default function donationRequest() {
             isSelected={selectedItems.includes(item.id)}
             onSelect={toggleItemSelection}
             status={item.status}
+            userRole="donor"
           />
         )}
         keyExtractor={(item) => item.id.toString()}

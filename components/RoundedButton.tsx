@@ -45,15 +45,17 @@ export default RoundedButton;
 
 const styles = StyleSheet.create({
     button: {
-        padding: 10,
-        borderRadius: 25,
+      paddingVertical: 10, 
+      paddingHorizontal: 20,
+      alignItems: 'center', 
+      borderRadius: 25,
         width: 200,
         marginTop: 20,
         justifyContent: 'center',
     },
     buttonText: {
         color: 'black',
-        fontSize: 18,
+        fontSize: 15,
         textAlign: 'center',
     },
     buttonContainer: {

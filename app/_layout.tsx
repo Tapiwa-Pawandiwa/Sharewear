@@ -13,6 +13,7 @@ import * as Linking from 'expo-linking';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import * as SecureStore from 'expo-secure-store';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 
 
@@ -148,6 +149,8 @@ useEffect(() => {
 
 const queryClient = new QueryClient();
   return (
+    <GestureHandlerRootView style={{ flex: 1 }}>
+
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
      <AuthProvider>
       <QueryClientProvider client={queryClient}>
@@ -165,6 +168,7 @@ const queryClient = new QueryClient();
       </QueryClientProvider>
      </AuthProvider>
     </ThemeProvider>
+    </GestureHandlerRootView>
  
   );
 }

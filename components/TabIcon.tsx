@@ -32,7 +32,7 @@ const TabIcon: React.FC<TabIconProps> = ({ name, focused ,library,label}) => {
       <View style={[styles.container, focused ? styles.focusedContainer : null]}>
       <IconComponent
         name={name}
-        size={focused? 35 : 25}
+        size={focused? 30 : 25}
         color={focused ? Colors.green.main : Colors.grey.light}
         style={styles.icon}
       />

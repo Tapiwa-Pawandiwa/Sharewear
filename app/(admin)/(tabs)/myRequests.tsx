@@ -13,14 +13,10 @@ import FilterChipList from "@/components/FilterChipList";
 import {Tables} from '@/app/database.types';
 import { useDonationRequestsByBeneficiary, useDonationsByRequest } from "@/app/hooks/useDonation";
 
-type DonationRequest = Tables<'donationRequest'>;
-type Donation = Tables<'donation'>;
+type DonationRequest = Tables<'donation_requests_with_categories_and_tags'>;
 
 export default function TabTwoScreen() {
   const { data: donationRequests, isLoading: loadingRequests } = useDonationRequestsByBeneficiary();
-  const requestIds = donationRequests?.map(request => request.id) || [];
-  const { data: donations, isLoading: loadingDonations } = useDonationsByRequest(requestIds);
-
   const [filteredRequests, setFilteredRequests] = useState<DonationRequest[]>([]);
   const [selectedFilter, setSelectedFilter] = useState<string>("All");
   const { profile } = useAuth();
@@ -37,43 +33,23 @@ export default function TabTwoScreen() {
   };
 
   useEffect(() => {
-    if (!donationRequests) return; // If no data, return early
+    const filtered = donationRequests?.filter(request => {
+        if (selectedFilter === "All") return true;
+        return request.status?.toUpperCase() === selectedFilter.toUpperCase(); // Check status against the filter
+    });
 
-    console.log("Donation Requests: ", donationRequests);
-    console.log("Donations: ", donations);
-
-    let filtered = donationRequests;
-
-    if (selectedFilter !== 'All') {
-      filtered = donationRequests.filter(request => {
-        const matchingDonations = donations?.filter(donation => donation.donationRequest_ID === request.id);
-        const matchingDonationStatuses = matchingDonations?.some(donation => donation.status === selectedFilter);
-        return request.status === selectedFilter || matchingDonationStatuses;
-      });
-    }
-
-    // Update the filteredRequests state
-    setFilteredRequests(filtered);
-  }, [selectedFilter, donationRequests, donations]);
-
-  // Han
+    setFilteredRequests(filtered || []);
+}, [selectedFilter, donationRequests]);
   
   const handleFilterChange = (filter: string) => {
     setSelectedFilter(filter);
   };
 
   const renderItem = ({ item }: { item: DonationRequest }) => {
-    const associatedDonations = donations?.filter((donation) => donation.donationRequest_ID === item.id);
-
     return (
       <RequestCard
-        headline={item.headline}
-        location={item.formatted_address}
-        status={item.status}
-        description={item.description}
-        items={associatedDonations?.length || 0}
-        image={item.images?.[0] || ''}
-        onManage={() => handleManage(item)}
+         donationRequest={item}
+         onManage={() => handleManage(item)}
       />
     );
   };
@@ -91,24 +67,17 @@ export default function TabTwoScreen() {
           <FilterChipList onFilterChange={handleFilterChange} />
         </View>
       </View>
-      <View>
-        {/* <FlatList
-          data={filteredRequests}
-          renderItem={renderItem}
-          keyExtractor={(item) => item.id}
-          contentContainerStyle={{ paddingBottom: 20 }}
-        /> */}
-          <FlatList
+      <View  style={styles.listContainer}>
+         <FlatList
           data={filteredRequests} // Now using filteredRequests instead of donationRequests
           renderItem={renderItem}
-          keyExtractor={(item) => item.id.toString()}
+          keyExtractor={(item, index) => item.donation_request_id ? item.donation_request_id.toString() : `unidentified-${index}`}
         />
         {selectedRequest && (
           <DonationRequestModal
             visible={isModalVisible}
             onClose={handleCloseModal}
-            description={selectedRequest.description}
-            items={[]} // If you want to pass associated items, fetch them from elsewhere
+            donationRequest={selectedRequest} // Pass the selected request correctly
           />
         )}
       </View>
@@ -155,4 +124,7 @@ const styles = StyleSheet.create({
   results: {
     marginTop: 25,
   },
+  listContainer:{
+    flex: 1,
+  }
 });

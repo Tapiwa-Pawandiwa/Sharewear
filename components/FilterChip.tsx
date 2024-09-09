@@ -40,25 +40,35 @@ export default FilterChip;
 
 const styles = StyleSheet.create({
   chipContainer: {
-    marginHorizontal: 3,
+    marginHorizontal: 5,
+    height: 30,
+    marginBottom: 10,
   },
   chip: {
     borderRadius: 20,
     backgroundColor: Colors.theme.tertiary,
-    margin: 4,
-    width: 80,
-    height: 30,
+    borderWidth: 0.2,
+    minWidth: 50,
+   padding: 10,
+   alignContent : "center",
+
+    height: 35,  
+ 
     justifyContent: "center",
     alignItems: "center",
   },
 
   selectedChip: {
     borderWidth: 0,
+    
   },
   chipText: {
     color: "black",
-    fontSize: 14,
+    fontSize: 12,
+    alignContent: "center",
+    textAlignVertical: "center",
     fontFamily: "Now-Regular",
+  
   },
   selectedChipText: {
     color: "white",

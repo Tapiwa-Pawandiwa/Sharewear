@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Text, FlatList, StyleSheet } from "react-native";
+import { View, Text, FlatList, StyleSheet, Dimensions } from "react-native";
 import { useDonationsByDonor, useDonationWithDetails } from "@/app/hooks/useDonation";
 import { Tables } from "@/app/database.types";
 import DonationCard from "./DonationCard";
@@ -9,23 +9,29 @@ import FilterChip from "../FilterChip";
 type DonationWithDetails = Tables<"donation_with_details">;
 
 const DonationList: React.FC = () => {
-  const { data: donationsWithDetails, isLoading } = useDonationsByDonor();
+  const windowHeight = Dimensions.get('window').height;
+  const { data: donations, isLoading } = useDonationsByDonor();
+  console.log(donations, 'FROM DONATION LIST')
   const [selectedStatus, setSelectedStatus] = useState<string>("ALL");
 
   const filterDonations = (donations: DonationWithDetails[]) => {
     if (selectedStatus === "ALL") {
+      
       return donations;
+      
     }
     return donations.filter(
+    
       (donation) => donation.donation_status === selectedStatus
     );
+
   };
 
-  if (isLoading || !donationsWithDetails) {
+  if (isLoading || !donations) {
     return <Text>Loading...</Text>; // Handle loading state
   }
 
-  const filteredDonations = filterDonations(donationsWithDetails);
+  const filteredDonations = filterDonations(donations);
 
   const statusCategories = [
     { id: "ALL", name: "All" },
@@ -34,9 +40,9 @@ const DonationList: React.FC = () => {
     { id: "COMPLETE", name: "Complete" },
   ];
   return (
-    <View>
+    <View style={styles.container}>
       <View style={styles.chipsContainer}>
-      {statusCategories.map((category) => (
+       {statusCategories.map((category) => (
           <FilterChip
             key={category.id}
             name={category.name}
@@ -47,19 +53,23 @@ const DonationList: React.FC = () => {
               setSelectedStatus(status);
             }}
           />
-        ))}
+        ))} 
+
       </View>
+
       <FlatList
     data={filteredDonations} // Display only filtered donations
     renderItem={({ item }) => {
-      return <DonationCard donation={item} />;
+      return <DonationCard donation={item} type="donor" />;
     }}
-        keyExtractor={(item: DonationWithDetails) =>
-          item.donation_id?.toString() || "fallback-key"
-        }
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.flatListContainer}
-      />
+    keyExtractor={(item) => `${item.donation_id}`}
+    showsVerticalScrollIndicator={true}
+    contentContainerStyle={{ height: windowHeight,
+     }}
+snapToInterval={windowHeight}
+
+
+  />
     </View>
   );
 };
@@ -67,10 +77,18 @@ const DonationList: React.FC = () => {
 export default DonationList;
 
 const styles = StyleSheet.create({
-  flatListContainer: {},
+  container:{
+    flex: 1,
+    padding: 10,
+  },
+  flatListContainer: {
+   
+  },
   chipsContainer: {
     flexDirection: "row",
-    justifyContent: "space-around",
-    padding: 10,
+    alignContent: "center",
+    justifyContent: 'center',
+    marginBottom: 10,
+ 
   },
 });

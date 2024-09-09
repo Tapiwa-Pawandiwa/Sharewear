@@ -35,7 +35,7 @@ const DonationRequestCard: React.FC<DonationRequestCardProps> = ({ donationReque
             style={styles.image}
             contentFit="cover"
             placeholder={{uri: "https://via.placeholder.com/150"}}
-            cachePolicy="memory-disk"
+            cachePolicy="memory-disk" //'memory-disk' - Image is cached in memory, but with a fallback to the disk cache.
           />
         )}
         width={210}
@@ -64,7 +64,7 @@ const styles = StyleSheet.create({
     width: 210,
     height: 150,
     backgroundColor: "white",
-    borderRadius: 25,
+    borderRadius: 30,
     shadowColor: "black",
 
     margin: 10,
@@ -75,7 +75,7 @@ const styles = StyleSheet.create({
     height: 100,
     alignContent: "center",
     alignSelf: "center",
-    borderRadius: 25,
+    borderRadius: 20,
     marginBottom: 10,
   },
   textContainer: {
@@ -90,7 +90,7 @@ const styles = StyleSheet.create({
     fontFamily: "LeagueSpartan-Regular",
     marginBottom: 5,
     fontWeight: 400,
-    lineHeight: 18,
+    lineHeight: 0,
   },
   subtitle: {
     fontSize: 14,

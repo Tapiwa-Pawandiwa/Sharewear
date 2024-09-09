@@ -1,4 +1,4 @@
-import { StyleSheet, Image, FlatList } from "react-native";
+import { StyleSheet, Image, FlatList, Dimensions } from "react-native";
 import ToggleSwitch from "@/components/ToggleSwitch";
 import RequestCard from "@/components/admin/RequestCard";
 import { Text, View } from "@/components/Themed";
@@ -6,111 +6,82 @@ import Colors from "@/constants/Colors";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/app/providers/Auth";
 import { useEffect, useState } from "react";
-import DonationRequestModal from "../modals/DonationRequestModal";
 import Carousel from "react-native-reanimated-carousel";
+import DonationModal from "../modals/DonationModal";
 import RemoteImage from "@/components/RemoteImage";
 import FilterChipList from "@/components/FilterChipList";
 import {Tables} from '@/app/database.types';
-import { useDonationRequestsByBeneficiary, useDonationsByRequest } from "@/app/hooks/useDonation";
+import { useDonationByBeneficiary, useDonationRequestsByBeneficiary, useDonationsByRequest } from "@/app/hooks/useDonation";
+import DonationCard from "@/components/user/DonationCard";
+import { useDonorContext } from "@/app/providers/Donor";
 
 type DonationRequest = Tables<'donationRequest'>;
-type Donation = Tables<'donation'>;
+type DonationWithDetails = Tables<'donation_with_details'>;
 
 export default function myDonations() {
-  const { data: donationRequests, isLoading: loadingRequests } = useDonationRequestsByBeneficiary();
-  const requestIds = donationRequests?.map(request => request.id) || [];
-  const { data: donations, isLoading: loadingDonations } = useDonationsByRequest(requestIds);
+  const windowHeight = Dimensions.get('window').height;
 
-  const [filteredRequests, setFilteredRequests] = useState<DonationRequest[]>([]);
+  const { data: donations, isLoading: loadingDonations } = useDonationByBeneficiary();
   const [selectedFilter, setSelectedFilter] = useState<string>("All");
-  const { profile } = useAuth();
-  const [selectedRequest, setSelectedRequest] = useState<DonationRequest | null>(null);
+  const { setSelectedDonation, selectedDonation } = useDonorContext(); // Get setSelectedDonation from context
+
   const [isModalVisible, setIsModalVisible] = useState(false);
 
-  const handleManage = (request: DonationRequest) => {
-    setSelectedRequest(request);
+  const handleManage = (donation: DonationWithDetails) => {
+    setSelectedDonation(donation);
     setIsModalVisible(true);
+    
   };
 
   const handleCloseModal = () => {
     setIsModalVisible(false);
   };
 
-  useEffect(() => {
-    if (!donationRequests) return; // If no data, return early
-
-    console.log("Donation Requests: ", donationRequests);
-    console.log("Donations: ", donations);
-
-    let filtered = donationRequests;
-
-    if (selectedFilter !== 'All') {
-      filtered = donationRequests.filter(request => {
-        const matchingDonations = donations?.filter(donation => donation.donationRequest_ID === request.id);
-        const matchingDonationStatuses = matchingDonations?.some(donation => donation.status === selectedFilter);
-        return request.status === selectedFilter || matchingDonationStatuses;
-      });
-    }
-
-    // Update the filteredRequests state
-    setFilteredRequests(filtered);
-  }, [selectedFilter, donationRequests, donations]);
-
-  // Han
   
   const handleFilterChange = (filter: string) => {
     setSelectedFilter(filter);
   };
 
-  const renderItem = ({ item }: { item: DonationRequest }) => {
-    const associatedDonations = donations?.filter((donation) => donation.donationRequest_ID === item.id);
+  const filteredDonations = donations?.filter((donation) => {
+    if (selectedFilter === "All") return true;
+    return donation.donation_status === selectedFilter.toUpperCase(); // Ensure status matches filter
+  }) || [];
 
-    return (
-      <RequestCard
-        headline={item.headline}
-        location={item.formatted_address}
-        status={item.status}
-        description={item.description}
-        items={associatedDonations?.length || 0}
-        image={item.images?.[0] || ''}
-        onManage={() => handleManage(item)}
-      />
-    );
+  const renderItem = ({ item }: { item: DonationWithDetails }) => {
+    return <DonationCard donation={item} type="requester" onManage={()=>handleManage(item)} />;
   };
+  
   return (
     <View style={styles.container}>
       <View style={styles.headerContainer}>
         <View style={styles.innerContainer}>
-          <Text style={styles.title}>My Requests</Text>
+          <Text style={styles.title}>Donations </Text>
           <Image
             source={require("../../../assets/images/birdbox.png")}
             style={styles.image}
           />
         </View>
         <View style={styles.filterContainer}>
-          <FilterChipList onFilterChange={handleFilterChange} />
+          <FilterChipList onFilterChange={handleFilterChange} type="donation"/>
         </View>
       </View>
-      <View>
-        {/* <FlatList
-          data={filteredRequests}
-          renderItem={renderItem}
-          keyExtractor={(item) => item.id}
-          contentContainerStyle={{ paddingBottom: 20 }}
-        /> */}
+      <View style={styles.listContainer}>
           <FlatList
-          data={filteredRequests} // Now using filteredRequests instead of donationRequests
-          renderItem={renderItem}
-          keyExtractor={(item) => item.id.toString()}
+        data={filteredDonations}
+        renderItem={renderItem}
+        keyExtractor={(item, index) => index.toString()}
+        contentContainerStyle={{ height: windowHeight,paddingBottom: 20 }}
+        showsVerticalScrollIndicator={true}
+        snapToInterval={windowHeight}
+
+      />  
+         {selectedDonation && (
+        <DonationModal
+          visible={isModalVisible}
+          onClose={handleCloseModal}
+          donation={selectedDonation} // Use selectedDonation from context
         />
-        {selectedRequest && (
-          <DonationRequestModal
-            visible={isModalVisible}
-            onClose={handleCloseModal}
-            description={selectedRequest.description}
-            items={[]} // If you want to pass associated items, fetch them from elsewhere
-          />
-        )}
+      )}
       </View>
     </View>
   );
@@ -155,4 +126,8 @@ const styles = StyleSheet.create({
   results: {
     marginTop: 25,
   },
+  
+  listContainer:{
+flex: 1,
+  }
 });

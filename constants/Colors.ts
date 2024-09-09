@@ -38,7 +38,7 @@ export default {
   red:{
     main: '#FF0000',
     alt: '#CC8383',
-    hard: '#F15B5B'
+    hard: '#A00505'
   },
   theme:{
     primary: '#008000',

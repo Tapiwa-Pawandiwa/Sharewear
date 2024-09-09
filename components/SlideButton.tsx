@@ -1,5 +1,7 @@
 import React, { useState, useRef } from 'react';
-import { View, Text, PanResponder, Animated, StyleSheet } from 'react-native';
+import { View, Text, Animated, StyleSheet } from 'react-native';
+import { PanGestureHandler, State } from 'react-native-gesture-handler';
+
 import { Ionicons } from '@expo/vector-icons';
 import Colors from '@/constants/Colors';
 
@@ -15,41 +17,40 @@ const SlideButton: React.FC<SlideButtonProps> = ({ title, onSlideComplete, butto
   const [slideComplete, setSlideComplete] = useState(false);
   const slideAnim = useRef(new Animated.Value(0)).current;
 
-  const panResponder = useRef(
-    PanResponder.create({
-      onMoveShouldSetPanResponder: () => true,
-      onPanResponderMove: (e, gestureState) => {
-        if (!disabled) {
-          const slideDistance = Math.min(gestureState.dx, 200); // Limit sliding to 200px
-          slideAnim.setValue(slideDistance);
-        }
-      },
-      onPanResponderRelease: (e, gestureState) => {
-        if (gestureState.dx > 150) {
-          // Consider slide complete if moved more than 150px
-          setSlideComplete(true);
-          onSlideComplete();
-        } else {
-          // Reset the animation if the slide wasn't far enough
-          Animated.spring(slideAnim, {
-            toValue: 0,
-            useNativeDriver: false,
-          }).start();
-        }
-      },
-    })
-  ).current;
+  const handleGestureEvent = Animated.event(
+    [{ nativeEvent: { translationX: slideAnim } }],
+    { useNativeDriver: false }
+  );
+
+  const handleGestureStateChange = (event: any) => {
+    if (event.nativeEvent.state === State.END) {
+      if (event.nativeEvent.translationX > 150) {
+        setSlideComplete(true);
+        onSlideComplete();
+      } else {
+        // Reset the animation if the slide wasn't far enough
+        Animated.spring(slideAnim, {
+          toValue: 0,
+          useNativeDriver: false,
+        }).start();
+      }
+    }
+  };
+
 
   return (
     <View style={[styles.button, buttonStyle]}>
-      <Animated.View style={[styles.buttonContent, { transform: [{ translateX: slideAnim }] }]}>
-        <Ionicons name="arrow-forward-circle" size={24} color="white" style={styles.icon} />
-        {!slideComplete && <Text style={[styles.buttonText, textStyle]}>{title}</Text>}
-      </Animated.View>
-      <Animated.View {...panResponder.panHandlers} style={[styles.overlay, { opacity: slideAnim.interpolate({
-        inputRange: [0, 200],
-        outputRange: [1, 0],
-      }) }]}/>
+       <PanGestureHandler
+        onGestureEvent={handleGestureEvent}
+        onHandlerStateChange={handleGestureStateChange}
+        enabled={!disabled}
+      >
+ <Animated.View style={[styles.buttonContent, { transform: [{ translateX: slideAnim }] }]}>
+          <Ionicons name="arrow-forward-circle" size={24} color="white" style={styles.icon} />
+          {!slideComplete && <Text style={[styles.buttonText, textStyle]}>{title}</Text>}
+        </Animated.View>
+      </PanGestureHandler>
+     
     </View>
   );
 };

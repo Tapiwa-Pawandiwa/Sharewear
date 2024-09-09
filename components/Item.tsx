@@ -1,28 +1,28 @@
 import { View, Pressable, Text, StyleSheet } from "react-native";
+import { Tables } from "@/app/database.types";
 
-interface ItemType {
-  id: number;
-  name: string;
-  quantity: number;
-  donationRequest_ID: number | null;
-  status: 'AVAILABLE' | 'PENDING' | 'COMPLETE' | null; // Add the status field
+type Item = Tables<'item'>;
 
-}
 
 // Define the props for the ItemComponent
 interface ItemProps {
-  item: ItemType;
+  item: Item;
   isSelected: boolean;
-  onSelect: (item: ItemType) => void;
-    status: 'AVAILABLE' | 'PENDING' | 'COMPLETE' | null; // Add the status prop
+  onSelect: (item: Item) => void;
+  status: 'AVAILABLE' | 'PENDING' | 'COMPLETE' | 'FAILED' | 'UNAVAILABLE' | null; // Add the status prop
+  userRole: 'donor' | 'beneficiary'; // New prop to differentiate user roles
+
 }
 
 const Item: React.FC<ItemProps> = ({
   item,
   isSelected,
   onSelect,
+  userRole,// New prop to differentiate user roles
   status,
+
 }) => {
+
   const itemStyle = [
     styles.item,
     isSelected ? styles.selected : null,
@@ -30,10 +30,23 @@ const Item: React.FC<ItemProps> = ({
     item.status === "COMPLETE" ? styles.complete : null,
   ];
 
+
+  const isSelectable = () => {
+    if (userRole === 'donor') {
+      // Donor can only select if the item is 'AVAILABLE'
+      return item.status === 'AVAILABLE';
+    } else if (userRole === 'beneficiary') {
+      // Beneficiary can select if item is 'PENDING' or 'COMPLETE'
+      return item.status === 'PENDING' || item.status === 'COMPLETE';
+    }
+    return false;
+  };
+
   return (
     <Pressable
-      onPress={() => item.status !== "COMPLETE" && onSelect(item)} // Prevent selection if complete
+      onPress={() => isSelectable() && onSelect(item)} // Call onSelect only if the item is selectable
       style={itemStyle}
+      disabled={!isSelectable()} // Disable Pressable if item isn't selectable
     >
       <View style={styles.checkboxContainer}>
         <Text style={styles.checkboxText}>{isSelected ? "✓" : "○"}</Text>

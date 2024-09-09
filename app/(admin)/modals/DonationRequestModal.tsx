@@ -1,36 +1,33 @@
 import React, { useState } from 'react';
 import { View, Text, Modal, StyleSheet, FlatList, Button } from 'react-native';
+import { Tables } from '@/app/database.types';
 
-interface Item {
-  id: number;
-  name: string;
-  quantity: number;
-}
+type DonationRequest = Tables<'donation_requests_with_categories_and_tags'>;
 
 interface DonationRequestModalProps {
   visible: boolean;
   onClose: () => void;
-  description: string;
-  items: Item[];
-}
+  donationRequest: DonationRequest;}
 
-const DonationRequestModal: React.FC<DonationRequestModalProps> = ({ visible, onClose, description, items }) => {
+const DonationRequestModal: React.FC<DonationRequestModalProps> = ({ visible, onClose, donationRequest}) => {
+  
+  
+  
   return (
     <Modal visible={visible} transparent={true} animationType="slide">
       <View style={styles.modalContainer}>
         <View style={styles.modalContent}>
-          
-          <Text style={styles.title}>Manage Request</Text>
-          <Text style={styles.description}>{description}</Text>
 
+          <Text style={styles.title}>Manage Request</Text>
+         <Text>Description</Text>
+          <Text style={styles.description}>{donationRequest.description}</Text>
           <Text style={styles.itemsHeader}>Items:</Text>
           <FlatList
-            data={items}
-            keyExtractor={(item) => item.id.toString()}
+            data={donationRequest.item_names}
+            keyExtractor={(donationRequest) => donationRequest}
             renderItem={({ item }) => (
               <View style={styles.itemRow}>
-                <Text>{item.name}</Text>
-                <Text>Quantity: {item.quantity}</Text>
+                <Text>{item}</Text>
               </View>
             )}
           />
@@ -48,20 +45,26 @@ const styles = StyleSheet.create({
   modalContainer: {
     flex: 1,
     justifyContent: 'center',
+    marginTop: 50,
     alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    backgroundColor: 'rgba(0,0,0,0.4)',
+    
   },
   modalContent: {
-    height: '90%',
+    height : '90%',
+    marginTop: 50,
     padding: 20,
+    width: '100%',
     backgroundColor: 'white',
-    borderRadius: 10,
+    borderRadius: 50,
     elevation: 5,
   },
   title: {
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 10,
+    textAlign: 'center',
+    alignSelf: 'center',
   },
   description: {
     fontSize: 16,

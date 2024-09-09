@@ -509,6 +509,7 @@ export type Database = {
           secondary_location: string | null
           status: Database["public"]["Enums"]["status"] | null
           tag_names: string[] | null
+          time_added: string | null
         }
         Relationships: [
           {
@@ -530,9 +531,12 @@ export type Database = {
           donationRequest_ID: number | null
           donor_ID: string | null
           expiration_time: string | null
+          first_name: string | null
           images: string[] | null
-          item_name: string | null
-          item_status: Database["public"]["Enums"]["status"] | null
+          item_ids: number[] | null
+          last_name: string | null
+          phone_number: string | null
+          time_added: string | null
           timer_canceled: boolean | null
           timer_start_time: string | null
         }
@@ -567,7 +571,7 @@ export type Database = {
       }
       update_donation_request_status: {
         Args: {
-          donation_request_id: number
+          donationrequest_id: number
         }
         Returns: undefined
       }

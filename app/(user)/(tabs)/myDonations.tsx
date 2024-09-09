@@ -8,16 +8,15 @@ const myDonations = () => {
     <View style={styles.container}>
       <View style={styles.headerContainer}>
         <View style={styles.innerContainer}>
+        <Text style={styles.heading}>My Donations</Text>
           <Image
             source={require("@/assets/images/birdbox.png")}
             style={styles.headImage}
           />
-          <Text style={styles.heading}>My Donations</Text>
+       
         </View>
       </View>
-      <View style={styles.listContainer}>
-        <DonationList />
-      </View>
+      <DonationList />
     </View>
   );
 };
@@ -30,19 +29,21 @@ const styles = StyleSheet.create({
     backgroundColor: "#ffff",
   },
   headerContainer: {
-    height: 180,
+
     borderRadius: 40,
     width: "95%",
     marginTop: 20,
     marginLeft: 10,
- 
+
+
     padding: 15,
   },
   innerContainer: {
     flexDirection: "row",
     alignItems: "center",
     borderRadius: 40,
-    marginTop: 30,
+    marginTop: 50,
+    justifyContent: 'space-between',
     alignSelf: "center",
   },
 
@@ -51,8 +52,9 @@ const styles = StyleSheet.create({
     fontFamily: "LeagueSpartan-Regular",
   },
   headImage: {
-    width: 100,
-    height: 100,
+    width: 60,
+    height: 60,
+    marginLeft: 80,
   },
   listContainer: {
     alignItems: "center",

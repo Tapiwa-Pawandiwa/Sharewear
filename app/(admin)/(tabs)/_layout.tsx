@@ -1,4 +1,5 @@
 import React from "react";
+import { useEffect, useState } from "react";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import { Link, Tabs } from "expo-router";
@@ -8,6 +9,8 @@ import { useColorScheme } from "@/components/useColorScheme";
 import { useClientOnlyValue } from "@/components/useClientOnlyValue";
 import TabIcon from "@/components/TabIcon";
 import DonationsTabIcon from "@/components/DonationsTabIcon";
+import { useDonationByBeneficiary } from "@/app/hooks/useDonation";
+import { useAuth } from "@/app/providers/Auth";
 
 // You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
 function TabBarIcon(props: {
@@ -17,8 +20,18 @@ function TabBarIcon(props: {
   return <FontAwesome size={28} style={{ marginBottom: -3 }} {...props} />;
 }
 
+
 export default function TabLayout() {
   const colorScheme = useColorScheme();
+  const { data: donations, isLoading } = useDonationByBeneficiary();
+  const {profile} = useAuth();
+
+ const [numberOfPendingDonations, setNumberOfPendingDonations] = useState(0);
+
+  useEffect(() => {
+    const count = donations?.filter(donation => donation.donation_status === 'PENDING').length || 0;
+    setNumberOfPendingDonations(count);
+  }, [donations,profile]);  
 
   return (
     <Tabs
@@ -96,7 +109,8 @@ export default function TabLayout() {
           headerShown: false,
           tabBarActiveTintColor: Colors.green.main,
           tabBarIcon: ({ focused }) => (
-            <DonationsTabIcon focused={focused} label="Donations" />
+            <DonationsTabIcon focused={focused} label="Donations"  pendingCount={numberOfPendingDonations}
+            />
           ),
         }}
       />

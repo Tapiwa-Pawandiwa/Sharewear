@@ -6,9 +6,10 @@ import Colors from "@/constants/Colors";
 interface TabIconProps {
   label: string;
   focused: boolean;
+  pendingCount?: number; 
 }
 
-const DonationsTabIcon: React.FC<TabIconProps> = ({ focused, label }) => {
+const DonationsTabIcon: React.FC<TabIconProps> = ({ focused, label, pendingCount=0 }) => {
   return (
     <View style={[styles.container, focused ? styles.focusedContainer : null]}>
       <View style={styles.iconContainer}>
@@ -18,13 +19,17 @@ const DonationsTabIcon: React.FC<TabIconProps> = ({ focused, label }) => {
           color={focused ? Colors.green.main : Colors.grey.light}
           style={styles.boxIcon}
         />
-        {/* Second Icon: Hand */}
         <FontAwesome5
           name="hand-holding"
           size={focused ? 35 : 25}
           color={focused ? Colors.green.main : Colors.grey.light}
           style={styles.handIcon}
         />
+           {pendingCount > 0 && (
+          <View style={styles.badge}>
+            <Text style={styles.badgeText}>{pendingCount}</Text>
+          </View>
+        )}
       </View>
       <Text style={[styles.labelText, focused ? styles.focusedLabel : null]}>
         {label}
@@ -69,6 +74,20 @@ const styles = StyleSheet.create({
     color: Colors.green.main,
     fontSize: 14,
     width: 100,
+  },
+  badge: {
+    position: 'absolute',
+    bottom: 18,
+    left: 32, 
+    backgroundColor: Colors.theme.tertiary,
+    borderRadius: 10,
+    width: 20,
+    height: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },badgeText: {
+    color: 'white',
+    fontSize: 12,
   },
 });
 
