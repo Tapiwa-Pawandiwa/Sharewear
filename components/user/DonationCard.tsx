@@ -47,7 +47,9 @@ const DonationCard: React.FC<DonationCardProps> = ({
             {donation.first_name || ""} donated
           </Text>
         ) : (
-          <Text style={styles.addressText}>
+          <Text style={styles.addressText}
+            numberOfLines={2}
+          >
                       {donation.donation_request_address || "Address not available"}
 
           </Text>
@@ -131,7 +133,7 @@ const styles = StyleSheet.create({
     fontFamily: "Now-Light",
     fontWeight: "100",
     fontSize: 10,
-    maxWidth: 130,
+    maxWidth: 130, 
     marginBottom: 10,
   },
   headlineText: {
@@ -139,7 +141,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     marginBottom: 5,
     fontFamily: 'LeagueSpartan-Regular',
-    lineHeight: 15,
+    lineHeight: 16,
     width: 130
   },
   donationRequest: {

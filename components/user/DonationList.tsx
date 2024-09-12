@@ -100,6 +100,7 @@ const DonationList: React.FC = () => {
         }}
         keyExtractor={(item) => `${item.donation_id}-${item.donation_id}`}
         showsVerticalScrollIndicator={true}
+        contentContainerStyle={{paddingBottom:100}}
       />
      
     </View>

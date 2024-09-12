@@ -105,10 +105,8 @@ export default function myDonations() {
           data={filteredDonations}
           renderItem={renderItem}
           keyExtractor={(item, index) => index.toString()}
-          contentContainerStyle={{ height: windowHeight + 100 }}
+          contentContainerStyle={{paddingBottom:100}}
           showsVerticalScrollIndicator={true}
-          snapToInterval={windowHeight}
-          overScrollMode="never" // Disable glow effect on Android
         />
         
       </View>
@@ -166,5 +164,6 @@ const styles = StyleSheet.create({
 
   listContainer: {
     flex: 1,
+    height: '100%',
   },
 });

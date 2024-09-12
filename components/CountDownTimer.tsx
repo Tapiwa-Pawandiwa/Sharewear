@@ -7,6 +7,7 @@ import Colors from '@/constants/Colors';
 import { Image } from 'expo-image';
 
 type donationTimers = Tables<'donation_timers'>;
+type Donation = Tables<'donation'>;
 
 interface CountdownTimerProps {
   createdTime: string; // The time in ISO format
@@ -21,42 +22,42 @@ const CountdownTimer: React.FC<CountdownTimerProps> = ({ createdTime, donationId
   
   const [timeLeft, setTimeLeft] = useState<number>(0);
   const [timerCanceled, setTimerCanceled] = useState<boolean>(false); // Track if the timer is canceled
+  const [donationComplete, setDonationComplete] = useState<boolean>(false); // Track if the donation is complete
 
 
   useEffect(() => {
-    const fetchTimerStatus = async () => {
-      try {
-        // Fetch donation timer details
-        const { data, error } = await supabase
-          .from('donation_timers')
-          .select('timer_canceled')
-          .eq('donation_id', donationId)
-          .single();
-
-        if (error || !data) {
-          console.error('Error fetching donation timer:', error);
-        } else {
-          setTimerCanceled(data.timer_canceled || false);
+    const timerChannel = supabase
+      .channel('donation-timer-channel')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'donation_timers', filter: `donation_id=eq.${donationId}` },
+        (payload) => {
+          const updatedTimer = payload.new as donationTimers;
+          setTimerCanceled(updatedTimer.timer_canceled ?? false);
         }
-      } catch (err) {
-        console.error('Error fetching donation timer:', err);
-      }
+      )
+      .subscribe();
+
+    const donationChannel = supabase
+      .channel('donation-status-channel')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'donation', filter: `id=eq.${donationId}` },
+        (payload) => {
+          const updatedDonation = payload.new as Donation;
+          if (updatedDonation.status === 'COMPLETE') {
+            setDonationComplete(true);
+            setTimeLeft(0); // Stop the timer if the donation is complete
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(timerChannel);
+      supabase.removeChannel(donationChannel);
     };
-
-    fetchTimerStatus();
   }, [donationId]);
-
-  const channels = supabase.channel('custom-all-channel')
-  .on(
-    'postgres_changes',
-    { event: '*', schema: 'public', table: 'donation_timers' },
-    (payload) => {
-      console.log('Change received!', payload)
-    }
-  )
-  .subscribe()
-
-
 
   useEffect(() => {
     if (timerCanceled) return; // If the timer is canceled, don't start the countdown
@@ -81,7 +82,8 @@ const CountdownTimer: React.FC<CountdownTimerProps> = ({ createdTime, donationId
     } else {
       setTimeLeft(0); // Expired if the time is in the past
     }
-  }, [createdTime, timerCanceled]);
+  }, [createdTime, timerCanceled,donationComplete]);
+
 
   // Animated style
   const animatedStyle = useAnimatedStyle(() => {
@@ -96,12 +98,14 @@ const CountdownTimer: React.FC<CountdownTimerProps> = ({ createdTime, donationId
 
   return (
     <Animated.View style={[styles.timerContainer, animatedStyle]}>
-        <Image
-          style={styles.timeImage}
-          source={require("@/assets/icons/time.png")}
-          contentFit="contain"
-        />
-    {timerCanceled ? (
+    <Image
+      style={styles.timeImage}
+      source={require("@/assets/icons/time.png")}
+      contentFit="contain"
+    />
+    {donationComplete ? (
+      <Text style={styles.timerText}>Complete</Text>
+    ) : timerCanceled ? (
       <Text style={styles.timerText}>Expired</Text>
     ) : timeLeft > 0 ? (
       <Text style={styles.timerText}>{`${minutes} min ${seconds} sec`}</Text>
