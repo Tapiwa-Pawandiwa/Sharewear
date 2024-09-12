@@ -45,6 +45,8 @@ export default {
     secondary: '#263238',
     tertiary: '#91B680',
     accent: '#F3EFE8',
+    contrast: '#ED5024',
+    brown: '#B6B3AB',
     background: '#1C2F14'
     
   }

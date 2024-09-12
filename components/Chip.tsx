@@ -70,4 +70,8 @@ marginVertical: 4,
   selectedChipText: {
     color: 'white',
   },
+  timeImage: {
+    width: 45,
+    height: 30,
+  },
 });

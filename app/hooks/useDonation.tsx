@@ -118,7 +118,7 @@ const fetchDonationRequestsWithCategory = async (): Promise<DonationRequestWithC
 
     // Filter out donation requests that only have 'COMPLETE' items
     const filteredData = data.filter(request => 
-        request.item.some((item: Item) => item.status === 'AVAILABLE' || item.status === 'PENDING')
+        request.status === 'AVAILABLE' || request.status === 'PENDING'
     );
 
     // Process images as before
@@ -134,7 +134,7 @@ const fetchDonationRequestsWithCategory = async (): Promise<DonationRequestWithC
             return { ...request, images };
         })
     );
-
+    console.log(requestsWithImages)
     return requestsWithImages || [];
 };
 
@@ -302,6 +302,19 @@ const fetchDonationsByRequest = async (requestIds: number[]): Promise<Donation[]
     return data || [];
 }
 
+const fetchItemsByDonationRequest = async (requestId: number): Promise<Item[]> => {
+    const { data, error } = await supabase
+        .from('item')
+        .select('*')
+        .eq('donationRequest_ID', requestId);
+
+    if (error) {
+        throw error;
+    }
+
+    return data || [];
+}
+
 const fetchItemsByDonation = async (itemIds: number[]): Promise<Item[]> => {
     const { data, error } = await supabase
         .from('item')
@@ -316,6 +329,11 @@ const fetchItemsByDonation = async (itemIds: number[]): Promise<Item[]> => {
 };
 
 // React Query hook to fetch items by multiple donation IDs
+
+export const useItemsByDonationRequest = (requestId: number) => {
+    return useQuery(['itemsByDonationRequest', requestId], () => fetchItemsByDonationRequest(requestId));
+}
+
 export const useItemsByDonation = (itemIds: number[]) => {
     return useQuery(['itemsByDonation', itemIds], () => fetchItemsByDonation(itemIds), {
         enabled: !!itemIds.length,  // Only run if itemIds array is not empty

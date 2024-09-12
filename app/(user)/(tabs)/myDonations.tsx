@@ -16,7 +16,8 @@ const myDonations = () => {
        
         </View>
       </View>
-      <DonationList />
+              <DonationList />
+
     </View>
   );
 };

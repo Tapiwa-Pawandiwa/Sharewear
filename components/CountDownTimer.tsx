@@ -4,6 +4,7 @@ import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-na
 import {Tables} from '@/app/database.types';
 import { supabase } from '@/lib/supabase';
 import Colors from '@/constants/Colors';
+import { Image } from 'expo-image';
 
 type donationTimers = Tables<'donation_timers'>;
 
@@ -45,6 +46,18 @@ const CountdownTimer: React.FC<CountdownTimerProps> = ({ createdTime, donationId
     fetchTimerStatus();
   }, [donationId]);
 
+  const channels = supabase.channel('custom-all-channel')
+  .on(
+    'postgres_changes',
+    { event: '*', schema: 'public', table: 'donation_timers' },
+    (payload) => {
+      console.log('Change received!', payload)
+    }
+  )
+  .subscribe()
+
+
+
   useEffect(() => {
     if (timerCanceled) return; // If the timer is canceled, don't start the countdown
 
@@ -73,7 +86,7 @@ const CountdownTimer: React.FC<CountdownTimerProps> = ({ createdTime, donationId
   // Animated style
   const animatedStyle = useAnimatedStyle(() => {
     return {
-      opacity: withTiming(timeLeft > 0 ? 1 : 0.5), // Example animation
+      opacity: withTiming(timeLeft > 0 ? 1 : 1), // Example animation
     };
   });
 
@@ -83,6 +96,11 @@ const CountdownTimer: React.FC<CountdownTimerProps> = ({ createdTime, donationId
 
   return (
     <Animated.View style={[styles.timerContainer, animatedStyle]}>
+        <Image
+          style={styles.timeImage}
+          source={require("@/assets/icons/time.png")}
+          contentFit="contain"
+        />
     {timerCanceled ? (
       <Text style={styles.timerText}>Expired</Text>
     ) : timeLeft > 0 ? (
@@ -100,12 +118,17 @@ const styles = StyleSheet.create({
   timerContainer: {
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 5,
+    marginRight: 5,
+  
   },
   timerText: {
     fontSize: 12,
     color: Colors.red.hard,
-    fontFamily: 'Now-Light',
-    opacity: 1,
+    fontFamily: 'Now-light',
+    
+  },
+  timeImage: {
+    width: 45,
+    height: 30,
   },
 });

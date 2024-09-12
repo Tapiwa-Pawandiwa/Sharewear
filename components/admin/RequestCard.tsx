@@ -5,23 +5,27 @@ import Colors from "@/constants/Colors";
 import RemoteImage from "../RemoteImage";
 import { Tables } from "@/app/database.types";
 import { Image } from "expo-image";
+import { useItemsByDonationRequest } from "@/app/hooks/useDonation";
 
 
 type DonationRequest = Tables<'donation_requests_with_categories_and_tags'>;
 
 interface RequestCardProps {
-  onManage: () => void;
 donationRequest: DonationRequest;
 }
 
 const RequestCard: React.FC<RequestCardProps> = ({
   donationRequest,
-  onManage
 }) => {
 
+  const {data: Items} = useItemsByDonationRequest(donationRequest.donation_request_id ?? 0);
+
+  //filter items on the item status == 'AVAILABLE'
+  const availableItems = Items?.filter((item) => item.status === 'AVAILABLE');
 
   //Add max quanity for the amount of characters in the description
   return (
+    
     <View style={styles.container}>
       <Image
         style={styles.image}
@@ -32,16 +36,9 @@ const RequestCard: React.FC<RequestCardProps> = ({
       <View style={styles.heading}>
         <Text style={styles.headlineStyle}>{donationRequest.headline}</Text>
         <Text style={styles.statusStyle}>Status: {donationRequest.status}</Text>
-        <Text style={styles.itemStyle}>{donationRequest.item_names?.length} Items</Text>
+        <Text style={styles.itemStyle}>{Items?.length} Items</Text>
       </View>
-      <View style={styles.manageButtonContainer}>
-        <RoundedButton
-          title="Manage"
-          buttonStyle={styles.manageButton}
-          textStyle={styles.buttonText}
-          onPress={onManage}
-        />
-      </View>
+     
     </View>
   );
 };
@@ -64,7 +61,7 @@ const styles = StyleSheet.create({
   },
   heading: {
     marginLeft: 10,
-    maxWidth: 150,
+    maxWidth: 190,
   },
   headlineStyle: {
     fontSize: 14,
@@ -104,7 +101,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     backgroundColor: Colors.beige.main,
     width: 90,
-    marginTop: 20,
+    borderRadius: 25,
     right: 10,
     height: 30,
 
@@ -121,8 +118,8 @@ const styles = StyleSheet.create({
   manageButtonContainer: {
     alignItems: "center",
     justifyContent: "center",
-    bottom: 30, // Ensure the button is at the bottom
-    right: 10,
+    right: 0,
+    bottom: 25,
     position: "absolute", // Absolute positioning to place the button
 
   }

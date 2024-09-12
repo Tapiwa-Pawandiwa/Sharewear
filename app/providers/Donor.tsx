@@ -293,8 +293,32 @@ export const DonorProvider: React.FC<DonorProviderProps> = ({ children }) => {
           return { success: false, error: donationUpdateError.message };
         }
 
-        // 6. Cancel the timer if the donation is marked as COMPLETE
-          //our trigger should cancel the timer
+        
+        if (confirmedItems.length > 0) {
+          const { error: donationUpdateError } = await supabase
+              .from("donation")
+              .update({ status: "COMPLETE", timer_trigger: false })
+              .eq("id", selectedDonation.donation_id);
+      
+          if (donationUpdateError) {
+              console.error("Failed to update donation status to 'COMPLETE'", donationUpdateError);
+              return { success: false, error: donationUpdateError.message };
+          }
+      
+          // Invoke the edge function to cancel the timer
+          const { error: timerCancelError } = await supabase.functions.invoke(
+              "failExpiredDonations",
+              {
+                  method: "DELETE",
+                  body: { donation_id: selectedDonation.donation_id },
+              }
+          );
+      
+          if (timerCancelError) {
+              console.error("Failed to cancel the timer in edge function", timerCancelError);
+          }
+      }
+
       }
       setSelectedItems([]);
       console.log("Donation confirmation successful");

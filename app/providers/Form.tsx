@@ -229,6 +229,7 @@ export const FormProvider: React.FC<FormProviderProps> = ({ children }) => {
               category_ID: item.category_ID,
               donationRequest_ID: donationRequestID,
               beneficiary_ID: item.beneficiary_ID,
+              status: 'AVAILABLE'
             },
           ])
           .select();

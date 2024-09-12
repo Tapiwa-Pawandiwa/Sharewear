@@ -81,30 +81,33 @@ serve(async (req) => {
           return;
         }
 
+
         if (donation.status === "COMPLETE" || donation.status === "FAILED") {
-          console.log(
-            `Donation ${donation_id} is already completed or failed. No action needed.`,
-          );
+          console.log(`Donation ${donation_id} is already completed or failed. No action needed.`);
+    
+          // Mark the timer as canceled in the donation_timers table
+          await supabase
+              .from("donation_timers")
+              .update({ timer_canceled: true })
+              .eq("donation_id", donation_id);
+    
           return;
         }
+    
 
         console.log(`Marking donation ${donation_id} as FAILED.`);
 
-        await supabase
-          .from("donation")
-          .update({ status: "FAILED" })
-          .eq("id", donation_id);
-        await supabase
-          .from("donation")
-          .update({ status: "FAILED", timer_trigger: false })
-          .eq("id", donation_id);
+    await supabase
+      .from("donation")
+      .update({ status: "FAILED", timer_trigger: false })
+      .eq("id", donation_id);
 
-        await supabase
-          .from("item")
-          .update({ status: "AVAILABLE" })
-          .eq("donationRequest_ID", donation.donationRequest_ID);
+    await supabase
+      .from("item")
+      .update({ status: "AVAILABLE" })
+      .eq("donationRequest_ID", donation.donationRequest_ID);
 
-        delete activeTimers[donation_id];
+    delete activeTimers[donation_id];
         console.log(`Donation ${donation_id} marked as FAILED.`);
       }, 5 * 60 * 1000); // 5 minutes for testing
 

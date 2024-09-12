@@ -61,6 +61,7 @@ SplashScreen.preventAutoHideAsync();
     "Now-Medium": require("../assets/fonts/Now-Medium.otf"),
     "Now-Black": require("../assets/fonts/Now-Black.otf"),
     "SFPro-Regular": require("../assets/fonts/SFPro-Regular.ttf"),
+    "SFPro-Medium": require("../assets/fonts/SF-Pro-Text-Medium.otf"),
     "LeagueSpartan-Bold": require("../assets/fonts/LeagueSpartan-Bold.ttf"),
     "LeagueSpartan-Regular": require("../assets/fonts/LeagueSpartan-Regular.ttf"),
     "LeagueSpartan-Light": require("../assets/fonts/LeagueSpartan-Light.ttf"),

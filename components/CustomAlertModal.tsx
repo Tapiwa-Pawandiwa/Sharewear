@@ -11,7 +11,7 @@ interface CustomAlertProps {
     buttonText?: string;
     image?: any;
     visible: boolean;
-    message?: string;
+    message?: string | null;
     loading?: boolean;
     progress?: number;
   }

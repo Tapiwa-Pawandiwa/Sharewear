@@ -1,7 +1,6 @@
-import { StyleSheet, Image, FlatList, Dimensions } from "react-native";
+import { StyleSheet, Image, FlatList, Dimensions, Text, View, TouchableOpacity } from "react-native";
 import ToggleSwitch from "@/components/ToggleSwitch";
 import RequestCard from "@/components/admin/RequestCard";
-import { Text, View } from "@/components/Themed";
 import Colors from "@/constants/Colors";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/app/providers/Auth";
@@ -10,47 +9,83 @@ import Carousel from "react-native-reanimated-carousel";
 import DonationModal from "../modals/DonationModal";
 import RemoteImage from "@/components/RemoteImage";
 import FilterChipList from "@/components/FilterChipList";
-import {Tables} from '@/app/database.types';
-import { useDonationByBeneficiary, useDonationRequestsByBeneficiary, useDonationsByRequest } from "@/app/hooks/useDonation";
+import { Tables } from "@/app/database.types";
+import {
+  useDonationByBeneficiary,
+  useDonationRequestsByBeneficiary,
+  useDonationsByRequest,
+} from "@/app/hooks/useDonation";
 import DonationCard from "@/components/user/DonationCard";
 import { useDonorContext } from "@/app/providers/Donor";
 
-type DonationRequest = Tables<'donationRequest'>;
-type DonationWithDetails = Tables<'donation_with_details'>;
+type DonationRequest = Tables<"donationRequest">;
+type DonationWithDetails = Tables<"donation_with_details">;
 
 export default function myDonations() {
-  const windowHeight = Dimensions.get('window').height;
+  const windowHeight = Dimensions.get("window").height;
 
-  const { data: donations, isLoading: loadingDonations } = useDonationByBeneficiary();
+  const { data: donations, isLoading: loadingDonations, refetch } =
+    useDonationByBeneficiary();
   const [selectedFilter, setSelectedFilter] = useState<string>("All");
   const { setSelectedDonation, selectedDonation } = useDonorContext(); // Get setSelectedDonation from context
 
   const [isModalVisible, setIsModalVisible] = useState(false);
 
+  useEffect(() => {
+    const channel = supabase.channel('donation-updates')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'donation_with_details' },
+        (payload) => {
+          console.log('Change received!', payload);
+          refetch(); // Refetch data whenever a change is received
+        }
+      )
+      .subscribe();
+
+    // Cleanup the subscription on component unmount
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [refetch]);
+
+
   const handleManage = (donation: DonationWithDetails) => {
     setSelectedDonation(donation);
     setIsModalVisible(true);
-    
   };
 
   const handleCloseModal = () => {
     setIsModalVisible(false);
   };
 
-  
   const handleFilterChange = (filter: string) => {
     setSelectedFilter(filter);
   };
-
-  const filteredDonations = donations?.filter((donation) => {
-    if (selectedFilter === "All") return true;
-    return donation.donation_status === selectedFilter.toUpperCase(); // Ensure status matches filter
-  }) || [];
+  
+  const filteredDonations = (
+    donations?.filter((donation) => {
+      if (selectedFilter === "All") return true;
+      return donation.donation_status === selectedFilter.toUpperCase(); // Ensure status matches filter
+    }) || []
+  ).sort((a, b) => {
+    const dateA = a.time_added ? new Date(a.time_added).getTime() : 0; // Handle null by assigning 0
+    const dateB = b.time_added ? new Date(b.time_added).getTime() : 0;
+    return dateB - dateA; // Sort in descending order
+  });
 
   const renderItem = ({ item }: { item: DonationWithDetails }) => {
-    return <DonationCard donation={item} type="requester" onManage={()=>handleManage(item)} />;
-  };
-  
+    return (
+      <TouchableOpacity onPress={() => handleManage(item)} >
+        <DonationCard
+          donation={item}
+          type="requester"
+          onManage={() => handleManage(item)}
+        />
+      </TouchableOpacity>
+    );
+  }
+
   return (
     <View style={styles.container}>
       <View style={styles.headerContainer}>
@@ -62,27 +97,28 @@ export default function myDonations() {
           />
         </View>
         <View style={styles.filterContainer}>
-          <FilterChipList onFilterChange={handleFilterChange} type="donation"/>
+          <FilterChipList onFilterChange={handleFilterChange} type="donation" />
         </View>
       </View>
       <View style={styles.listContainer}>
-          <FlatList
-        data={filteredDonations}
-        renderItem={renderItem}
-        keyExtractor={(item, index) => index.toString()}
-        contentContainerStyle={{ height: windowHeight,paddingBottom: 20 }}
-        showsVerticalScrollIndicator={true}
-        snapToInterval={windowHeight}
-
-      />  
-         {selectedDonation && (
-        <DonationModal
-          visible={isModalVisible}
-          onClose={handleCloseModal}
-          donation={selectedDonation} // Use selectedDonation from context
+        <FlatList
+          data={filteredDonations}
+          renderItem={renderItem}
+          keyExtractor={(item, index) => index.toString()}
+          contentContainerStyle={{ height: windowHeight + 100 }}
+          showsVerticalScrollIndicator={true}
+          snapToInterval={windowHeight}
+          overScrollMode="never" // Disable glow effect on Android
         />
-      )}
+        
       </View>
+      {selectedDonation && (
+          <DonationModal
+            visible={isModalVisible}
+            onClose={handleCloseModal}
+            donation={selectedDonation} // Use selectedDonation from context
+          />
+        )}
     </View>
   );
 }
@@ -90,6 +126,7 @@ export default function myDonations() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: "#ffff",
   },
   title: {
     fontSize: 30,
@@ -126,8 +163,8 @@ const styles = StyleSheet.create({
   results: {
     marginTop: 25,
   },
-  
-  listContainer:{
-flex: 1,
-  }
+
+  listContainer: {
+    flex: 1,
+  },
 });
