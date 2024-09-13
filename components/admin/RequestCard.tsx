@@ -64,11 +64,11 @@ const styles = StyleSheet.create({
     maxWidth: 190,
   },
   headlineStyle: {
-    fontSize: 14,
+    fontSize: 16,
     marginBottom: 5,  
     color: Colors.grey.dark,
-  
-
+    fontFamily: 'LeagueSpartan-Regular',
+    lineHeight: 16,
   },
   statusStyle: {
     fontSize: 12,

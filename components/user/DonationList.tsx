@@ -19,25 +19,53 @@ const DonationList: React.FC = () => {
   const windowHeight = Dimensions.get("window").height;
   const { data: donations, isLoading, refetch } = useDonationsByDonor();
   const [selectedStatus, setSelectedStatus] = useState<string>("ALL");
+  const [donationUpdates, setDonationUpdates] = useState<Record<number, any>>({});
 
+  // Subscribe to donation and timer changes and update state accordingly
   useEffect(() => {
-    const channel = supabase
-      .channel("donation-updates")
+    const donationChannel = supabase.channel("donation-updates")
+    .on(
+      "postgres_changes",
+      { event: "*", schema: "public", table: "donation_with_details" },
+      (payload) => {
+        if (payload.new && (payload.new as DonationWithDetails).donation_id) {
+          const updatedDonation = payload.new as DonationWithDetails;
+          setDonationUpdates((prev) => ({
+            ...prev,
+            [updatedDonation.donation_id!]: {
+              ...prev[updatedDonation.donation_id!],
+              status: updatedDonation.donation_status,
+            },
+          }));
+        }
+      }
+    )
+    .subscribe();
+
+    const timerChannel = supabase.channel("donation-timer-updates")
       .on(
         "postgres_changes",
-        { event: "*", schema: "public", table: "donation_with_details" },
+        { event: "*", schema: "public", table: "donation_timers" },
         (payload) => {
-          console.log("Change received!", payload);
-          refetch(); // Refetch data whenever a change is received
+          if (payload.new && (payload.new as DonationWithDetails).donation_id) {
+            const updatedTimer = payload.new as DonationWithDetails;
+            setDonationUpdates((prev) => ({
+              ...prev,
+              [updatedTimer.donation_id!]: {
+                ...prev[updatedTimer.donation_id!],
+                timerCanceled: updatedTimer.timer_canceled ?? false,
+              },
+            }));
+          }
         }
       )
       .subscribe();
 
-    // Cleanup the subscription on component unmount
     return () => {
-      supabase.removeChannel(channel);
+      supabase.removeChannel(donationChannel);
+      supabase.removeChannel(timerChannel);
     };
-  }, [refetch]);
+  }, []);
 
   const filterAndSortDonations = (donations: DonationWithDetails[]) => {
     const filtered =
@@ -75,6 +103,7 @@ const DonationList: React.FC = () => {
     { id: "FAILED", name: "Failed" },
     { id: "COMPLETE", name: "Complete" },
   ];
+
   return (
     <View style={styles.container}>
       <View style={styles.chipsContainer}>
@@ -96,7 +125,10 @@ const DonationList: React.FC = () => {
       <FlatList
         data={filteredDonations} // Display only filtered donations
         renderItem={({ item }) => {
-          return <DonationCard donation={item} type="donor" />;
+          const update = donationUpdates[item.donation_id!] || {}; // Ensure donation_id is available
+
+          return <DonationCard donation={item} type="donor"  donationStatus={update.status || item.donation_status}
+              timerCanceled={update.timerCanceled ?? item.timer_canceled} />;
         }}
         keyExtractor={(item) => `${item.donation_id}-${item.donation_id}`}
         showsVerticalScrollIndicator={true}

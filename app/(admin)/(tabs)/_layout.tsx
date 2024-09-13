@@ -23,15 +23,8 @@ function TabBarIcon(props: {
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
-  const { data: donations, isLoading } = useDonationByBeneficiary();
-  const {profile} = useAuth();
 
- const [numberOfPendingDonations, setNumberOfPendingDonations] = useState(0);
 
-  useEffect(() => {
-    const count = donations?.filter(donation => donation.donation_status === 'PENDING').length || 0;
-    setNumberOfPendingDonations(count);
-  }, [donations,profile]);  
 
   return (
     <Tabs
@@ -109,7 +102,7 @@ export default function TabLayout() {
           headerShown: false,
           tabBarActiveTintColor: Colors.green.main,
           tabBarIcon: ({ focused }) => (
-            <DonationsTabIcon focused={focused} label="Donations"  pendingCount={numberOfPendingDonations}
+            <DonationsTabIcon focused={focused} label="Donations"
             />
           ),
         }}

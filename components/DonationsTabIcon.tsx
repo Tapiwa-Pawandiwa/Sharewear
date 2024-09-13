@@ -1,15 +1,65 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { FontAwesome5 } from "@expo/vector-icons";
 import Colors from "@/constants/Colors";
+import { supabase } from "@/lib/supabase";
+import { useAuth } from "@/app/providers/Auth";
 
 interface TabIconProps {
   label: string;
   focused: boolean;
-  pendingCount?: number; 
+
 }
 
-const DonationsTabIcon: React.FC<TabIconProps> = ({ focused, label, pendingCount=0 }) => {
+const DonationsTabIcon: React.FC<TabIconProps> = ({ focused, label }) => {
+  const [pendingCount, setPendingCount] = useState<number>(0);
+  const {profile} = useAuth();
+
+
+  useEffect(() => {
+    if (!profile?.id) return; // Ensure we have the profile ID before proceeding
+
+    const fetchPendingDonations = async () => {
+      const { data, error } = await supabase
+        .from("donation_with_details")
+        .select("*")
+        .eq("donation_status", "PENDING")
+        .eq("beneficiary_ID", profile.id); // Only fetch donations for this user
+
+      if (!error && data) {
+        setPendingCount(data.length);
+      }
+    };
+
+    // Subscribe to real-time changes in the user's donations
+    const subscription = supabase
+      .channel('donation-updates')
+      .on(
+        'postgres_changes',
+        {
+          event: '*', 
+          schema: 'public', 
+          table: 'donation_with_details',
+          filter: `beneficiary_ID=eq.${profile.id}`, // Only match the current user's donations
+        },
+        async (payload) => {
+          if (payload.eventType === "INSERT" || payload.eventType === "UPDATE") {
+            await fetchPendingDonations(); // Update count on insert or update
+          }
+        }
+      )
+      .subscribe();
+
+    // Fetch the initial pending donations
+    fetchPendingDonations();
+
+    // Cleanup the subscription when the component unmounts
+    return () => {
+      supabase.removeChannel(subscription);
+    };
+  }, [profile?.id]); 
+
+
   return (
     <View style={[styles.container, focused ? styles.focusedContainer : null]}>
       <View style={styles.iconContainer}>

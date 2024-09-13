@@ -1,25 +1,35 @@
 import Colors from "@/constants/Colors";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet } from "react-native";
 import RoundedButton from "../RoundedButton";
 import { Image } from "expo-image";
 import { Tables } from "@/app/database.types";
 import CountdownTimer from "../CountDownTimer";
 import Badge from "../Badge";
+import { supabase } from "@/lib/supabase";
 
 type DonationWithDetails = Tables<"donation_with_details">;
+type Donation = Tables<"donation">;
 
 interface DonationCardProps {
   donation: DonationWithDetails;
+  donationStatus: string;
+  timerCanceled: boolean;
   type?: "donor" | "requester";
   onManage?: () => void;
+  
 }
 
 const DonationCard: React.FC<DonationCardProps> = ({
   donation,
   type,
   onManage,
+  donationStatus,
+  timerCanceled,
 }) => {
+
+
+
   return (
     <View style={styles.container}>
       {donation.images && donation.images.length > 0 ? (
@@ -55,7 +65,7 @@ const DonationCard: React.FC<DonationCardProps> = ({
           </Text>
         )}
       </View>
-      {donation.donation_status === "COMPLETE" ? (
+      {donationStatus === "COMPLETE" ? (
         <View style={styles.badgeContainer}>
           <Badge text="Complete" />
         </View>
@@ -65,18 +75,9 @@ const DonationCard: React.FC<DonationCardProps> = ({
             <CountdownTimer
               createdTime={donation.timer_start_time}
               donationId={donation.donation_id}
+              timerCanceled={timerCanceled}
+              donationComplete={donationStatus === "COMPLETE"}
             />
-            <View style={styles.timeContainer}>
-              {type === "donor" &&
-                donation.donation_status === "PENDING" &&
-                donation.timer_canceled !== true && (
-                  <RoundedButton
-                    title="Cancel"
-                    buttonStyle={styles.button}
-                    textStyle={styles.buttonText}
-                  />
-                )}
-            </View>
           </View>
         )
       )}
