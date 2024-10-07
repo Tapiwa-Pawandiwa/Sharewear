@@ -43,7 +43,8 @@ export default CustomRadioButton;
 
 const styles = StyleSheet.create({
   radioButtonText: {
-    fontSize: 14,
+    fontSize: 16,
+    fontFamily: "Now-Regular",
   },
   radioButtonSelected: {
     backgroundColor: Colors.green.main,

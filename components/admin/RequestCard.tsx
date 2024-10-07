@@ -72,7 +72,7 @@ const styles = StyleSheet.create({
   },
   statusStyle: {
     fontSize: 12,
-    color: Colors.theme.primary,
+    color: Colors.theme.secondContrast,
     marginBottom: 5,
     fontFamily: "Now-Light",
   },

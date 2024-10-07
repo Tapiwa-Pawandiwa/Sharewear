@@ -9,6 +9,33 @@ import {
   useEffect,
   useState,
 } from "react";
+import * as Linking from "expo-linking";
+import * as QueryParams from "expo-auth-session/build/QueryParams";
+import * as WebBrowser from "expo-web-browser";
+import { makeRedirectUri } from "expo-auth-session";
+
+
+WebBrowser.maybeCompleteAuthSession(); // required for web only
+const redirectTo = makeRedirectUri();
+
+
+const createSessionFromUrl = async (url: string) => {
+  const { params, errorCode } = QueryParams.getQueryParams(url);
+
+  if (errorCode) throw new Error(errorCode);
+  const { access_token, refresh_token } = params;
+
+  if (!access_token) return;
+
+  const { data, error } = await supabase.auth.setSession({
+    access_token,
+    refresh_token,
+  });
+  if (error) throw error;
+  return data.session;
+};
+
+
 
 type AuthData = {
     session: Session | null;
@@ -68,9 +95,11 @@ export default function AuthProvider({ children }: PropsWithChildren) {
       const {
         data: { user: supabaseUser },
       } = await signIn();
-  
+      console.log(supabaseUser);
       setUser(supabaseUser);
+      setProfile(supabaseUser);
     };
+    
   
     const signUserOut = async () => {
       try {

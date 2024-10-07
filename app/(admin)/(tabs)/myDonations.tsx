@@ -1,4 +1,12 @@
-import { StyleSheet, Image, FlatList, Dimensions, Text, View, TouchableOpacity } from "react-native";
+import {
+  StyleSheet,
+  Image,
+  FlatList,
+  Dimensions,
+  Text,
+  View,
+  TouchableOpacity,
+} from "react-native";
 import ToggleSwitch from "@/components/ToggleSwitch";
 import RequestCard from "@/components/admin/RequestCard";
 import Colors from "@/constants/Colors";
@@ -24,19 +32,25 @@ type DonationWithDetails = Tables<"donation_with_details">;
 export default function myDonations() {
   const windowHeight = Dimensions.get("window").height;
 
-  const { data: donations, isLoading: loadingDonations, refetch } =
-    useDonationByBeneficiary();
+  const {
+    data: donations,
+    isLoading: loadingDonations,
+    refetch,
+  } = useDonationByBeneficiary();
   const [selectedFilter, setSelectedFilter] = useState<string>("All");
   const { setSelectedDonation, selectedDonation } = useDonorContext(); // Get setSelectedDonation from context
 
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [donationUpdates, setDonationUpdates] = useState<Record<number, any>>({});
+  const [donationUpdates, setDonationUpdates] = useState<Record<number, any>>(
+    {}
+  );
 
   useEffect(() => {
-    const donationChannel = supabase.channel('donation-updates')
+    const donationChannel = supabase
+      .channel("donation-updates")
       .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'donation_with_details' },
+        "postgres_changes",
+        { event: "*", schema: "public", table: "donation_with_details" },
         (payload) => {
           if (payload.new && (payload.new as DonationWithDetails).donation_id) {
             const updatedDonation = payload.new as DonationWithDetails;
@@ -52,13 +66,16 @@ export default function myDonations() {
       )
       .subscribe();
 
-    const timerChannel = supabase.channel('donation-timer-updates')
+    const timerChannel = supabase
+      .channel("donation-timer-updates")
       .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'donation_timers' },
+        "postgres_changes",
+        { event: "*", schema: "public", table: "donation_timers" },
         (payload) => {
-          if (payload.new && 'donation_id' in payload.new) {
-            const updatedTimer = payload.new as { donation_id: number, timer_canceled: boolean } | { [key: string]: any; };
+          if (payload.new && "donation_id" in payload.new) {
+            const updatedTimer = payload.new as
+              | { donation_id: number; timer_canceled: boolean }
+              | { [key: string]: any };
             setDonationUpdates((prev) => ({
               ...prev,
               [updatedTimer.donation_id]: {
@@ -89,7 +106,7 @@ export default function myDonations() {
   const handleFilterChange = (filter: string) => {
     setSelectedFilter(filter);
   };
-  
+
   const filteredDonations = (
     donations?.filter((donation) => {
       if (selectedFilter === "All") return true;
@@ -105,18 +122,18 @@ export default function myDonations() {
     const update = donationUpdates[item.donation_id!] || {};
 
     return (
-      <TouchableOpacity onPress={() => handleManage(item)} >
+      <TouchableOpacity onPress={() => handleManage(item)}>
         <DonationCard
           donation={item}
           type="requester"
           onManage={() => handleManage(item)}
           donationStatus={update.status || item.donation_status}
           timerCanceled={update.timerCanceled ?? item.timer_canceled}
-
+          onCancelDonation={async () => {}}
         />
       </TouchableOpacity>
     );
-  }
+  };
 
   return (
     <View style={styles.container}>
@@ -136,19 +153,18 @@ export default function myDonations() {
         <FlatList
           data={filteredDonations}
           renderItem={renderItem}
-          keyExtractor={(item, index) => index.toString()}
-          contentContainerStyle={{paddingBottom:100}}
+          keyExtractor={(item) => `${item.donation_id}`}
+          contentContainerStyle={{ paddingBottom: 100 }}
           showsVerticalScrollIndicator={true}
         />
-        
       </View>
       {selectedDonation && (
-          <DonationModal
-            visible={isModalVisible}
-            onClose={handleCloseModal}
-            donation={selectedDonation} // Use selectedDonation from context
-          />
-        )}
+        <DonationModal
+          visible={isModalVisible}
+          onClose={handleCloseModal}
+          donation={selectedDonation} // Use selectedDonation from context
+        />
+      )}
     </View>
   );
 }
@@ -196,6 +212,6 @@ const styles = StyleSheet.create({
 
   listContainer: {
     flex: 1,
-    height: '100%',
+    height: "100%",
   },
 });

@@ -26,7 +26,7 @@ const SlideButton: React.FC<SlideButtonProps> = ({ title, onSlideComplete, butto
     if (event.nativeEvent.state === State.END) {
       if (event.nativeEvent.translationX > 150) {
         setSlideComplete(true);
-        onSlideComplete();
+       {disabled ? undefined : onSlideComplete()} 
       } else {
         // Reset the animation if the slide wasn't far enough
         Animated.spring(slideAnim, {

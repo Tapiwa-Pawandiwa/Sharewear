@@ -13,6 +13,7 @@ interface TabIconProps {
 
 const DonationsTabIcon: React.FC<TabIconProps> = ({ focused, label }) => {
   const [pendingCount, setPendingCount] = useState<number>(0);
+  const [data, setData] = useState<any>([]);
   const {profile} = useAuth();
 
 
@@ -26,6 +27,7 @@ const DonationsTabIcon: React.FC<TabIconProps> = ({ focused, label }) => {
         .eq("donation_status", "PENDING")
         .eq("beneficiary_ID", profile.id); // Only fetch donations for this user
 
+        setData(data);
       if (!error && data) {
         setPendingCount(data.length);
       }
@@ -57,7 +59,7 @@ const DonationsTabIcon: React.FC<TabIconProps> = ({ focused, label }) => {
     return () => {
       supabase.removeChannel(subscription);
     };
-  }, [profile?.id]); 
+  }, [profile?.id, data]); 
 
 
   return (

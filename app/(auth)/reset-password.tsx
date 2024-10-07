@@ -36,7 +36,6 @@ const ResetPasswordScreen=()=> {
   return (
     <View>
       <Text>Reset Password</Text>
-
       <Text>Enter your new password</Text>
       <TextInput
         value={newPassword}

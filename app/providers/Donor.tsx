@@ -19,6 +19,7 @@ interface RequestContextType {
   setSelectedDonation: React.Dispatch<React.SetStateAction<Tables<"donation_with_details"> | null>>; // Add setter
   createDonation: () => Promise<{ success: boolean; error?: string }>;
   handleConfirmation : () => Promise<{ success: boolean; error?: string }>; // Added
+  cancelDonation: (donation: Tables<"donation_with_details">) => Promise<void>; // Updated type
 }
 
 const DonationContext = createContext<RequestContextType>({
@@ -34,6 +35,7 @@ const DonationContext = createContext<RequestContextType>({
   setDonation: () => {},
   createDonation: async () => ({ success: false }),
   handleConfirmation: async () => ({ success: false }), // Added
+  cancelDonation: async () => {}, // Added
 });
 
 interface DonorProviderProps {
@@ -46,7 +48,7 @@ export const DonorProvider: React.FC<DonorProviderProps> = ({ children }) => {
   const [items, setItems] = useState<Tables<"item">[]>([]);
   const [donation, setDonation] = useState<Tables<"donation">[]>([]);
   const [selectedItems, setSelectedItems] = useState<number[]>([]);
-
+  
   useEffect(() => {
     const channel = supabase
       .channel("donation-update-channel")
@@ -56,7 +58,7 @@ export const DonorProvider: React.FC<DonorProviderProps> = ({ children }) => {
         async (payload) => {
           const updatedDonation = payload.new;
           const donationId = updatedDonation.id;
-
+          
           if (updatedDonation.timer_trigger === false) {
             // Invoke the edge function to cancel the timer
             const { error } = await supabase.functions.invoke(
@@ -330,6 +332,59 @@ export const DonorProvider: React.FC<DonorProviderProps> = ({ children }) => {
     }
   };
 
+ const cancelDonation = async (donation: Tables<"donation_with_details">)=>{
+  if (!donation) {
+    console.error("No donation provided");
+    return;
+  }
+  try {
+    console.log('Cancelling donation with ID:', donation.donation_id);
+
+    // Assuming the donation object contains the donation id and details
+//the donaiton isnt updating as required - it is not 
+    // Step 1: Update the donation timer to mark it as canceled
+    const { error: timerCancelError } = await supabase.functions.invoke(
+      "failExpiredDonations",
+      {
+          method: "DELETE",
+          body: { donation_id: donation.donation_id },
+      }
+  );
+
+    // Step 2: Update the donation status to "FAILED" or any other relevant status
+    const { error: donationError } = await supabase
+      .from("donation")
+      .update({ status: "FAILED" , timer_trigger: false }) // Assuming "FAILED" represents a canceled donation
+      .eq("id", donation.donation_id);
+
+    if (donationError) {
+      console.error("Error updating donation status:", donationError);
+      return;
+    }
+
+   // step 3: Update the donation items status to "AVAILABLE"
+   const { error: itemError } = await supabase
+   .from("item")
+   .update({ status: "AVAILABLE"})
+   .eq("donationRequest_ID", donation.donationRequest_ID);
+
+   if(itemError){
+      console.error("Error updating item status during cancellation:", itemError);
+      return;
+   
+
+   }
+
+
+
+    console.log("Donation canceled successfully");
+  } catch (err) {
+    console.error("Unexpected error during cancellation:", err);
+  }
+
+
+ }
+
   return (
     <DonationContext.Provider
       value={{
@@ -342,6 +397,7 @@ export const DonorProvider: React.FC<DonorProviderProps> = ({ children }) => {
         donation,
         setDonation,
         createDonation,
+        cancelDonation,
         setSelectedDonation,
         selectedDonation,
         handleConfirmation// Added setDonation to the provider value

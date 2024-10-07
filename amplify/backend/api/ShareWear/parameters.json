@@ -1,6 +1,0 @@
-{
-  "AppSyncApiName": "ShareWear",
-  "DynamoDBBillingMode": "PAY_PER_REQUEST",
-  "DynamoDBEnableServerSideEncryption": false,
-  "AuthModeLastUpdated": "2024-06-16T15:03:00.355Z"
-}

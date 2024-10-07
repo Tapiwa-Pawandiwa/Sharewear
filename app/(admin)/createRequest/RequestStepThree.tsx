@@ -14,6 +14,7 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { Modal } from 'react-native';
 import { Status } from '@/app/providers/Form';
 import { CustomAlertModal } from '@/components/CustomAlertModal';
+import SlideButton from '@/components/SlideButton';
 
 
 
@@ -157,13 +158,9 @@ const RequestStepThree:React.FC = () => {
         />
 </View>
 <View style={styles.buttonBox}>
-    <RoundedButton title="Preview"  buttonStyle={styles.previewButton} textStyle={styles.previewText}/>
-    <RoundedButton title="Publish"
-     onPress={handlePublish}  
-     buttonStyle={styles.publishButton} 
-     textStyle={styles.publishText}
-     disabled={isUploading}
-     />
+<SlideButton title="Publish" onSlideComplete={handlePublish} buttonStyle={styles.publishButton} disabled={isUploading}/>
+
+ 
 
      {isUploading &&     <CustomAlertModal
                 visible={modalVisible}
@@ -255,29 +252,17 @@ const styles = StyleSheet.create({
   iconStyle:{
     marginLeft: 10,
   },
-  previewButton: {
-    width: 100,
-    backgroundColor: Colors.beige.main,
-    alignContent: 'center',
-    alignSelf: 'center',
-    marginRight: 15,  
-  },
+ 
   deleteIcon: {
     position: 'absolute',
     top: 5,
     right: 5,
   },
   publishButton: {
-    width: 100,
+    width: 200,
     backgroundColor: Colors.green.main,
     alignContent: 'center',
     alignSelf: 'center',
-   
-  },
-  previewText: {
-    color:'black',
-    textAlign: 'left',
-    lineHeight: 30,
    
   },
   publishText: {

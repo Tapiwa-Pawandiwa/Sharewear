@@ -15,7 +15,7 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "../providers/Auth";
 import * as Linking from "expo-linking";
-const signInScreen = () => {
+const resetMyPassword = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -35,65 +35,38 @@ const signInScreen = () => {
     setError("");
   };
 
-  const toggleShowPassword = () => {
-    setShowPassword(!showPassword);
-  };
+ 
 
   const trimInputs = () => {
     setEmail(email.trim());
     setPassword(password.trim());
   };
 
-  const signInwithEmail = async () => {
-    trimInputs();
-    try {
-      setLoading(true);
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: email,
-        password: password,
-      });
-
-      if (error) {
-        setError(error.message);
-      } else {
-        setError("");
-        if (isAdmin){
-          router.push("/(admin)");
-        }else {
-          router.push("/(user)");
+  const resetPasssword = async (email: string) => {
+    if(email === ''){
+        Alert.alert('Error', 'Please enter a valid email.');
+    }else {
+        console.log("reset password requested ...");
+        const resetPassswordURL = "sharewear://reset-password";
+        try {
+          const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
+            redirectTo: resetPassswordURL,
+          });
+          console.log('data',data);
+          return { data, error };
+        } catch (error) {
+          console.error("Error sending password reset email:", error);
         }
-        console.log("Sign in successful", data);
-      }
-    } catch (e: any) {
-      setLoading(false);
-      console.log("Sign up failed", e);
-      setError(e.message);
-      Alert.alert("Sign up failed, try again", e.message);
     }
+    
   };
-
-  const onSignOut = async () => {
-    setError("");
-
-    console.log("Signing out...");
-    try {
-      console.log("Sign out");
-    } catch (e: any) {
-      setError(e.message);
-      console.log("Sign out failed", e);
-    }
-    //expo go not supported so need work around here
-  };
-
- 
-
   return (
     <View style={styles.container}>
       <Image
         source={require("../../assets/images/logos/main-logo.png")}
         style={styles.image}
       />
-      <Text style={styles.title}>Welcome back </Text>
+      <Text style={styles.title}>Reset Password</Text>
       <View
         style={{
           borderBottomColor: "black",
@@ -114,65 +87,30 @@ const signInScreen = () => {
         onFocus={() => setIsEmailFocused(true)}
         onBlur={() => setIsEmailFocused(false)}
       />
-      <View style={styles.passwordContainer}>
-        <TextInput
-          style={[
-            styles.input,
-            ,
-            { borderColor: isPasswordFocused ? Colors.green.main : "black" },
-          ]}
-          placeholder="Password"
-          autoCapitalize="none"
-          value={password}
-          secureTextEntry={!showPassword}
-          onChangeText={setPassword}
-          onFocus={() => setIsPasswordFocused(true)}
-          onBlur={() => setIsPasswordFocused(false)}
-        />
-        <MaterialCommunityIcons
-          name={showPassword ? "eye-off" : "eye"}
-          size={24}
-          color="#aaa"
-          style={styles.icon}
-          onPress={toggleShowPassword}
-        />
-      </View>
+    
+    
       <View style={{ flexDirection: "row" }}>
-        <Text style={styles.loginSubtitle}>Don't have an account?</Text>
-        <Link href="/(auth)/sign-up">
+        <Text style={styles.loginSubtitle}>I shouldnt be here ? </Text>
+        <Link href="/(auth)/sign-in">
           <Text style={[styles.textLink, { color: Colors.green.main }]}>
-            {" "}
-            Sign Up
-          </Text>
-        </Link>
-      </View>
-      <View style={{ flexDirection: "row" }}>
-        <Link href="/(auth)/reset-my-password">
-          <Text style={[styles.textLink, { color: Colors.green.main }]}>
-            Reset Password
+            Sign In
           </Text>
         </Link>
       </View>
       {error && <Text style={{ color: "red" }}>{error}</Text>}
       <RoundedButton
-        title="Sign In"
-        onPress={signInwithEmail}
+        title="Reset Password"
+        onPress={() => resetPasssword(email)}
         buttonStyle={styles.button}
         textStyle={styles.buttonText}
         link=""
       />
-      <RoundedButton
-        title="Sign Out"
-        onPress={onSignOut}
-        buttonStyle={styles.button}
-        textStyle={styles.buttonText}
-        link=""
-      />
+    
     </View>
   );
 };
 
-export default signInScreen;
+export default resetMyPassword;
 
 const styles = StyleSheet.create({
   container: {

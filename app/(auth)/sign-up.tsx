@@ -98,6 +98,7 @@ const signUpScreen = () => {
         source={require("../../assets/images/logos/main-logo.png")}
         style={styles.image}
       />
+      <Text style={styles.headingText}>Let's get started</Text>
       <Text style={styles.title}>Create an Account Purpose: </Text>
       <View style={styles.radioButtonContainer}>
         <CustomRadioButton
@@ -171,7 +172,7 @@ const signUpScreen = () => {
     />
       </View>
       
-      <Text>
+      <Text style={styles.titleText}>
         Already have an account?
         <Link href="/(auth)/sign-in">
           <Text style={styles.resetText}> Sign In</Text>
@@ -216,6 +217,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
+  titleText:{
+    fontSize: 16,
+    color: Colors.theme.secondary,
+    marginTop: 20,
+  },
   icon: {
     position: "absolute",
     right: 20,
@@ -232,8 +238,14 @@ const styles = StyleSheet.create({
     width: 250,
     height: 115,
   },
+  headingText:{
+    fontSize: 24,
+    fontWeight: "bold",
+    color: Colors.theme.tertiary
+  },
   resetText: {
     color: Colors.green.main,
+    fontSize: 16,
   },
   radioGroup: {
     flexDirection: "row",

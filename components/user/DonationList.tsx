@@ -12,6 +12,8 @@ import { supabase } from "@/lib/supabase";
 import * as Progress from 'react-native-progress'
 import Colors from "@/constants/Colors";
 import { ActivityIndicator } from "react-native-paper";
+import { useDonorContext } from "@/app/providers/Donor";
+import { CustomAlertModal } from "../CustomAlertModal";
 
 type DonationWithDetails = Tables<"donation_with_details">;
 
@@ -20,7 +22,7 @@ const DonationList: React.FC = () => {
   const { data: donations, isLoading, refetch } = useDonationsByDonor();
   const [selectedStatus, setSelectedStatus] = useState<string>("ALL");
   const [donationUpdates, setDonationUpdates] = useState<Record<number, any>>({});
-
+  const {cancelDonation,setSelectedDonation} = useDonorContext();
   // Subscribe to donation and timer changes and update state accordingly
   useEffect(() => {
     const donationChannel = supabase.channel("donation-updates")
@@ -28,6 +30,8 @@ const DonationList: React.FC = () => {
       "postgres_changes",
       { event: "*", schema: "public", table: "donation_with_details" },
       (payload) => {
+       
+       
         if (payload.new && (payload.new as DonationWithDetails).donation_id) {
           const updatedDonation = payload.new as DonationWithDetails;
           setDonationUpdates((prev) => ({
@@ -126,15 +130,20 @@ const DonationList: React.FC = () => {
         data={filteredDonations} // Display only filtered donations
         renderItem={({ item }) => {
           const update = donationUpdates[item.donation_id!] || {}; // Ensure donation_id is available
+ 
+          const handleCancelDonation = async (donation: DonationWithDetails) => {
+            await cancelDonation(donation);
+          };
 
           return <DonationCard donation={item} type="donor"  donationStatus={update.status || item.donation_status}
-              timerCanceled={update.timerCanceled ?? item.timer_canceled} />;
+              timerCanceled={update.timerCanceled ?? item.timer_canceled}                       onCancelDonation={() => handleCancelDonation(item)} // Pass the bound cancel function
+              // Pass the bound cancel function
+              />;
         }}
         keyExtractor={(item) => `${item.donation_id}-${item.donation_id}`}
         showsVerticalScrollIndicator={true}
         contentContainerStyle={{paddingBottom:100}}
       />
-     
     </View>
   );
 };
