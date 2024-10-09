@@ -17,7 +17,6 @@ const myDonations = () => {
         </View>
       </View>
               <DonationList />
-
     </View>
   );
 };

@@ -15,6 +15,7 @@ export default ({ config }: { config: any }) => {
       resizeMode: "center",
       backgroundColor: "#ffffff",
     },
+  
     ios: {
       supportsTablet: true,
       bundleIdentifier: "com.tapiwap.Sharewear",
@@ -39,6 +40,7 @@ export default ({ config }: { config: any }) => {
       favicon: "./assets/images/favicon.png"
     },
     plugins: [
+       "expo-font",
       "expo-router",
       "expo-secure-store",
       [

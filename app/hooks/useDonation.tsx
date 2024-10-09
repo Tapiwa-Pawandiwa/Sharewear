@@ -23,7 +23,6 @@ const fetchDonationWithDetails = async (): Promise<DonationWithDetails[]> => {
     const { data, error } = await supabase
         .from('donation_with_details')
         .select('*');
-
     if (error) {
         throw error;
     }
@@ -71,7 +70,6 @@ const fetchItems = async (): Promise<Item[]> => {
     }
     return data || [];
 }
-
 
 const fetchDonationRequests = async (): Promise<DonationRequest[]> => {
     const { data, error } = await supabase

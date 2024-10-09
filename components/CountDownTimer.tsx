@@ -19,6 +19,8 @@ interface CountdownTimerProps {
   donationId: number | null;
   timerCanceled: boolean;
   donationComplete: boolean;
+  testID?: string;  // Add the testID prop
+
 }
 //update
 const CountdownTimer: React.FC<CountdownTimerProps> = ({
@@ -26,6 +28,7 @@ const CountdownTimer: React.FC<CountdownTimerProps> = ({
   donationId,
   timerCanceled,
   donationComplete,
+  testID,
 
 }) => {
   const FIVE_MINUTES_IN_MS = 5 * 60 * 1000;
@@ -73,7 +76,7 @@ const CountdownTimer: React.FC<CountdownTimerProps> = ({
   const seconds = Math.floor((timeLeft % 60000) / 1000);
 
   return (
-    <Animated.View style={[styles.timerContainer, animatedStyle]}>
+    <Animated.View style={[styles.timerContainer, animatedStyle]} testID={testID}>
       {donationComplete ? (
         <View style={styles.badgeContainer}>
           <Badge text="Complete" />

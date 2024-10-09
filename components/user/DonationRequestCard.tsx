@@ -36,8 +36,11 @@ const DonationRequestCard: React.FC<DonationRequestCardProps> = ({ donationReque
             contentFit="cover"
             placeholder={{uri: "https://via.placeholder.com/150"}}
             cachePolicy="memory-disk" //'memory-disk' - Image is cached in memory, but with a fallback to the disk cache.
-          />
+         
+            />
+            
         )}
+        testID="image-test-id"
         width={210}
         height={100}
         loop
@@ -46,7 +49,7 @@ const DonationRequestCard: React.FC<DonationRequestCardProps> = ({ donationReque
 
       <View style={styles.textContainer}>
         <Text style={styles.title} numberOfLines={1} ellipsizeMode="tail">
-          {donationRequest.headline}
+          {donationRequest.headline} 
         </Text>
         <Text style={styles.subtitle} numberOfLines={1} ellipsizeMode="tail">
           {donationRequest.formatted_address}

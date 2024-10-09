@@ -42,11 +42,15 @@ const DonationCard: React.FC<DonationCardProps> = ({
           style={styles.donationImage}
           cachePolicy="memory-disk"
           placeholder={{ uri: "https://via.placeholder.com/150" }}
+          testID="donation-image" 
+
         />
       ) : (
         <Image
           source={{ uri: "https://via.placeholder.com/150" }}
           style={styles.donationImage}
+          testID="donation-image" 
+
         />
       )}
       <View style={styles.donationRequest}>
@@ -76,6 +80,8 @@ const DonationCard: React.FC<DonationCardProps> = ({
               donationId={donation.donation_id}
               timerCanceled={timerCanceled}
               donationComplete={donationStatus === "COMPLETE"}
+              testID="countdown-timer"  
+
             />
             {donationStatus === "PENDING" && type === "donor" && !isCancelled && (
                                 <RoundedButton title="Cancel" onPress={
@@ -83,7 +89,7 @@ const DonationCard: React.FC<DonationCardProps> = ({
                                async () => {
                                     try {
                                       await onCancelDonation();
-                                      setIsCancelled(true) // Handle it as an async function
+                                      setIsCancelled(true) // Handled as an async function
                                     } catch (error) {
                                       console.error("Failed to cancel donation:", error);
                                     }
