@@ -21,7 +21,7 @@ const DonationRequestCard: React.FC<DonationRequestCardProps> = ({ donationReque
     href={{
       pathname: '/donationRequest/[id]',
       params: {
-        id: donationRequest.donation_request_id,
+        id: donationRequest.donation_request_id ?? '',
       },
     }}
     >

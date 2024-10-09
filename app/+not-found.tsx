@@ -3,6 +3,7 @@ import { StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
  
 import { Text, View } from '@/components/Themed';
+import React from 'react';
 
 export default function NotFoundScreen() {
   const router = useRouter();

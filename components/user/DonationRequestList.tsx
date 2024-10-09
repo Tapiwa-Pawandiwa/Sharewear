@@ -28,7 +28,6 @@ const DonationRequestList: React.FC<DonationRequestListProps> = ({ categoryId = 
         'postgres_changes',
         { event: '*', schema: 'public', table: 'donation_requests_with_categories_and_tags' },
         (payload) => {
-          console.log('Request Change received!', payload);
           refetch(); // Refetch donation requests when a change occurs
         }
       )

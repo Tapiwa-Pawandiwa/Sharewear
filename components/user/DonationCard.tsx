@@ -9,7 +9,6 @@ import Badge from "../Badge";
 import { supabase } from "@/lib/supabase";
 import { useDonorContext } from "@/app/providers/Donor";
 
-
 type DonationWithDetails = Tables<"donation_with_details">;
 type Donation = Tables<"donation">;
 
@@ -20,7 +19,6 @@ interface DonationCardProps {
   type?: "donor" | "requester";
   onManage?: () => void;
   onCancelDonation: () => Promise<void>; // Updated to return a Promise<void>
-  
 }
 
 const DonationCard: React.FC<DonationCardProps> = ({
@@ -29,9 +27,9 @@ const DonationCard: React.FC<DonationCardProps> = ({
   onManage,
   donationStatus,
   timerCanceled,
-  onCancelDonation
+  onCancelDonation,
 }) => {
-  const {cancelDonation} = useDonorContext();
+  const { cancelDonation } = useDonorContext();
   const [isCancelled, setIsCancelled] = useState(false);
 
   return (
@@ -42,72 +40,55 @@ const DonationCard: React.FC<DonationCardProps> = ({
           style={styles.donationImage}
           cachePolicy="memory-disk"
           placeholder={{ uri: "https://via.placeholder.com/150" }}
-          testID="donation-image" 
-
+          testID="donation-image"
         />
       ) : (
         <Image
           source={{ uri: "https://via.placeholder.com/150" }}
           style={styles.donationImage}
-          testID="donation-image" 
-
+          testID="donation-image"
         />
       )}
       <View style={styles.donationRequest}>
-      
         <Text style={styles.headlineText}>
           {donation.donation_request_headline || "Donation Request"}
         </Text>
 
-   
         {donation.donation_status === "COMPLETE" && type === "requester" ? (
           <Text style={styles.donorName}>
             {donation.first_name || ""} donated
           </Text>
         ) : (
-          <Text style={styles.addressText}
-            numberOfLines={2}
-          >
-                      {donation.donation_request_address || "Address not available"}
-
+          <Text style={styles.addressText} numberOfLines={2}>
+            {donation.donation_request_address || "Address not available"}
           </Text>
         )}
       </View>
 
-          <View style={styles.timer}>
-            <CountdownTimer
-              createdTime={donation.timer_start_time ?? ""}
-              donationId={donation.donation_id}
-              timerCanceled={timerCanceled}
-              donationComplete={donationStatus === "COMPLETE"}
-              testID="countdown-timer"  
-
-            />
-            {donationStatus === "PENDING" && type === "donor" && !isCancelled && (
-                                <RoundedButton title="Cancel" onPress={
-                                  
-                               async () => {
-                                    try {
-                                      await onCancelDonation();
-                                      setIsCancelled(true) // Handled as an async function
-                                    } catch (error) {
-                                      console.error("Failed to cancel donation:", error);
-                                    }
-                                  }}
-                                  textStyle={styles.cancelText}
-                                  buttonStyle={styles.cancelButton}
-                            
-                                
-                                />
-            )
-            }
-
-          </View>
-
-    
-        
-        
-          
+      <View style={styles.timer}>
+        <CountdownTimer
+          createdTime={donation.timer_start_time ?? ""}
+          donationId={donation.donation_id}
+          timerCanceled={timerCanceled}
+          donationComplete={donationStatus === "COMPLETE"}
+          testID="countdown-timer"
+        />
+        {donationStatus === "PENDING" && type === "donor" && !isCancelled && (
+          <RoundedButton
+            title="Cancel"
+            onPress={async () => {
+              try {
+                await onCancelDonation();
+                setIsCancelled(true); // Handled as an async function
+              } catch (error) {
+                console.error("Failed to cancel donation:", error);
+              }
+            }}
+            textStyle={styles.cancelText}
+            buttonStyle={styles.cancelButton}
+          />
+        )}
+      </View>
     </View>
   );
 };
@@ -135,8 +116,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginRight: 15,
   },
-  timer: {
-  },
+  timer: {},
 
   timeText: {
     color: Colors.grey.dark,
@@ -154,16 +134,16 @@ const styles = StyleSheet.create({
     fontFamily: "Now-Light",
     fontWeight: "100",
     fontSize: 10,
-    maxWidth: 130, 
+    maxWidth: 130,
     marginBottom: 10,
   },
   headlineText: {
     color: Colors.grey.dark,
     fontSize: 14,
     marginBottom: 5,
-    fontFamily: 'LeagueSpartan-Regular',
+    fontFamily: "LeagueSpartan-Regular",
     lineHeight: 16,
-    width: 130
+    width: 130,
   },
   donationRequest: {
     flex: 1, // Take available space
@@ -205,16 +185,15 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     justifyContent: "center",
   },
-  cancelText:{
+  cancelText: {
     color: "white",
     fontSize: 11,
     fontFamily: "Helvetica",
     alignSelf: "center",
   },
-  cancelButton :{
+  cancelButton: {
     backgroundColor: Colors.red.hard,
     alignContent: "center",
-    width: 80, 
-  }
-
+    width: 80,
+  },
 });

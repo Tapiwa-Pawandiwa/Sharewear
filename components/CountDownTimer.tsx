@@ -39,9 +39,7 @@ const CountdownTimer: React.FC<CountdownTimerProps> = ({
   const [timeLeft, setTimeLeft] = useState<number>(0);
 
   useEffect(() => {
-    console.log(timerCanceled, donationId);
     if (timerCanceled || donationComplete) return; // Stop the countdown if the timer is canceled or the donation is complete
-    
     const createdDate = new Date(createdTime).getTime();
     const now = Date.now();
     const expirationTime = createdDate + FIVE_MINUTES_IN_MS;

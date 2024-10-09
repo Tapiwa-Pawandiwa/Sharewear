@@ -57,12 +57,13 @@ const DonationModal: React.FC<DonationModalProps> = ({
     } else {
       bottomSheetModalRef.current?.dismiss();
     }
-    if (segments[0] !== "donations") {
-      onClose(); // Automatically close modal when navigating away from "donations"
+    //close modal when navigating away
+    if (segments.length > 0) {
+      onClose();
     }
+  
   }, [visible,segments]);
 
-  console.log(items, "ITEMS");
 
   const toggleItemSelection = (item: ItemType) => {
     setSelectedItems((prev) => {

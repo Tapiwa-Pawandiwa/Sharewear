@@ -92,8 +92,8 @@ describe('DonationCard Component', () => {
   });
 
   /**
-      Test: Verifies that the cancel donation button functions as expected.
-    Purpose: Ensures that pressing the "Cancel" button triggers the cancellation logic.
+   Test: Verifies that the cancel donation button functions as expected.
+   * Purpose: Ensures that pressing the "Cancel" button triggers the cancellation logic.
    */
   test('handles cancel donation button click correctly', async () => {
     render(

@@ -3,12 +3,12 @@ import 'dotenv/config';
 export default ({ config }: { config: any }) => {
   return {
     ...config,
-    name: "Sharewear",
-    slug: "Sharewear",
+    name: "ShareWhere",
+    slug: "sharewhere",
     version: "1.0.0",
     orientation: "portrait",
     icon: "./assets/images/icon.png",
-    scheme: "sharewear",
+    scheme: "sharewhere",
     userInterfaceStyle: "automatic",
     splash: {
       image: "./assets/images/logos/main-logo.png",
@@ -18,7 +18,7 @@ export default ({ config }: { config: any }) => {
   
     ios: {
       supportsTablet: true,
-      bundleIdentifier: "com.tapiwap.Sharewear",
+      bundleIdentifier: "com.tapiwap.ShareWhere",
       config: {
         googleMapsApiKey: process.env.GOOGLE_MAPS_API_KEY, // Ensure this is correctly loaded
       }
@@ -43,19 +43,20 @@ export default ({ config }: { config: any }) => {
        "expo-font",
       "expo-router",
       "expo-secure-store",
-      [
-        "@rnmapbox/maps",
-        {
-          "RNMapboxMapsImpl": "mapbox",
-          "RNMapboxMapsDownloadToken": process.env.MAPBOX_DOWNLOAD_TOKEN // Ensure this is correctly loaded
-        }
-      ]
     ],
     experiments: {
       typedRoutes: true
     },
+    expo: {
+    "extra": {
+      "eas": {
+        "projectId": "a01b18dd-775f-4cfd-933f-252431637bef"
+      }
+    }
+  },
     extra: {
       googleMapsApiKey: process.env.GOOGLE_MAPS_API_KEY, // Optional: if you need to reference it elsewhere
     },
-  };
+    "owner": "tapiwap",
+  }
 };

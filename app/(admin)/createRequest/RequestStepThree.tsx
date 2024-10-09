@@ -76,7 +76,6 @@ const RequestStepThree:React.FC = () => {
 
       const uploadedFilePaths = await uploadImages(localImages);
 
-      console.log('After uploadImages, images:', formData.images);
       if (uploadedFilePaths.length === 0) {
         Alert.alert('Error', 'There was an error uploading your images. Please try again.');
         return;
@@ -87,7 +86,6 @@ const RequestStepThree:React.FC = () => {
         images: [...formData.images, ...uploadedFilePaths],
         status: Status.AVAILABLE,
       };
-      console.log('Updated formData:', updatedFormData);
   
       // Post the updated form data
       const result = await postFormData(updatedFormData);

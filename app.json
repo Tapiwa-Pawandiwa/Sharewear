@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "Sharewear",
-    "slug": "Sharewear",
+    "name": "ShareWhere",
+    "slug": "sharewhere", 
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -9,11 +9,18 @@
     "userInterfaceStyle": "automatic",
     "splash": {
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff",
+      "width": 200, 
+      "height": 200,
+      "backgroundColor": "#ffffff"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "a01b18dd-775f-4cfd-933f-252431637bef"
+      }
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.tapiwap.Sharewear",
+      "bundleIdentifier": "com.tapiwap.ShareWhere",
     },
     "android": {
       "adaptiveIcon": {
@@ -28,17 +35,11 @@
     },
     "plugins": [
       "expo-router",
-      "expo-secure-store",
-      [
-        "@rnmapbox/maps",
-        {
-          "RNMapboxMapsImpl": "mapbox",
-          "RNMapboxMapsDownloadToken": "sk.ey...qg"
-        }
-      ]
+      "expo-secure-store"
     ],
     "experiments": {
       "typedRoutes": true
     }
-  }
+  },
+  "owner": "tapiwap"
 }
