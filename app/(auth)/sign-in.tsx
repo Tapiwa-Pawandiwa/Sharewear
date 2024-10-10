@@ -93,7 +93,7 @@ const signInScreen = () => {
         source={require("../../assets/images/logos/main-logo.png")}
         style={styles.image}
       />
-      <Text style={styles.title}>Welcome back </Text>
+      <Text style={styles.title}>Welcome</Text>
       <View
         style={{
           borderBottomColor: "black",

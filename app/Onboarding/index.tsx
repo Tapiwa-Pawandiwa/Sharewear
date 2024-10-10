@@ -17,8 +17,14 @@ const slides = [
     id: 2,
     title: "As a beneficiary",
     description: "Simply create a request by filling in a form, Sharewear ensures donations are made in a timely manner",
-    image: require("../../assets/images/save-earth.png"),
+    image: require("../../assets/images/fillform.png"),
   },
+  {
+    id:3, 
+    title: "As a donor",
+    description: "Browse through the list of requests and donate to those in need. BUT you have 24 hours to donate the items ",
+    image: require("../../assets/images/onboardingdonor.png"),
+  }
   // Add the rest of your slides here
 ];
 
@@ -68,11 +74,11 @@ const Onboarding = () => {
           </View>
         </SafeAreaView>
       )}
-      activeDotStyle={{ backgroundColor: Colors.green.main, width: 30 }}
+      activeDotStyle={{ backgroundColor: Colors.green.main, width: 35 }}
       showSkipButton
-      renderNextButton={() => <Text>Next</Text>}
-      renderSkipButton={() => <Text>Skip</Text>}
-      renderDoneButton={() => <Text>Done</Text>}
+      renderNextButton={() => <Text style={styles.navText}>Next</Text>}
+      renderSkipButton={() => <Text style={styles.navText}>Skip</Text>}
+      renderDoneButton={() => <Text style={styles.navText}>Done</Text>}
       onDone={handleDone}
     />
   );
@@ -92,6 +98,11 @@ const styles= StyleSheet.create({
   highlight: {
     fontWeight: 'bold',
   },
+  navText:{
+    fontSize: 25,
+    color: 'black'
+
+  },
   sliderImg: {
     width: 400,
     height: 450,
@@ -105,14 +116,12 @@ const styles= StyleSheet.create({
     textAlign: 'center',
   },
   descriptionContainer: {
-    width: 370,
+    
     height: 100,
-    padding: 15,
+
     backgroundColor: Colors.grey.background,
     justifyContent: 'center',
-    borderRadius: 50,
-    borderColor: 'grey',
-    borderWidth: 0.2,
+   
   },
   sectionTitle: {
     fontSize: 20,
