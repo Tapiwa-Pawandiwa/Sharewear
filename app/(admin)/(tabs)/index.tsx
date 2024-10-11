@@ -12,6 +12,7 @@ import { CustomAlertModal } from "@/components/CustomAlertModal";
 import Assets from "@/assets/Assets";
 import FilterChip from "@/components/FilterChip";
 import FilterChipList from "@/components/FilterChipList";
+import * as Progress from "react-native-progress";
 
 export default function TabOneScreen() {
   const router = useRouter();
@@ -27,19 +28,20 @@ export default function TabOneScreen() {
   useEffect(() => {
     if (params.showModal === 'true') {
       setModalVisible(true);
-      
-      // Remove the query parameter without causing a navigation
-      router.setParams({ showModal: undefined });
+      router.setParams({ showModal: undefined }); // Clear the parameter to prevent repeated modal display
+    }
+
+    if (params.showProgress === 'true') {
+      handleModal(); // Start showing the progress bar
+      router.setParams({ showProgress: undefined }); // Clear the parameter to prevent repeated progress display
     }
   }, [params, router]);
 
- 
   const handleModal = () => {
-    console.log('Starting handleModal');
-    setModalVisible(true);
-    setIsUploading(true);
+    setModalVisible(false); // Hide the modal initially
+    setIsUploading(true); // Start showing the progress bar
     setProgress(0); // Reset progress to 0 at the start
-  
+
     let currentProgress = 0;
     const interval = setInterval(() => {
       currentProgress += 0.1;
@@ -47,8 +49,8 @@ export default function TabOneScreen() {
       if (currentProgress >= 1) {
         clearInterval(interval);
         setProgress(1); // Ensure progress is exactly 1 at the end
-        setIsUploading(false);
-        setModalVisible(false); // Close modal when progress completes
+        setIsUploading(false); // Hide the progress bar when complete
+        setModalVisible(true); // Show the modal after completion
       }
     }, 500);
   };
@@ -56,11 +58,26 @@ export default function TabOneScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-        <CustomAlertModal
+     {isUploading && (
+      <View>
+           <Progress.Bar
+          progress={progress}
+          width={null}
+          color={Colors.green.main}
+          borderWidth={0}
+          height={4}
+          style={styles.progressBar}
+        />
+        <Text style={styles.progressText}> Uploading... </Text>
+      </View>
+     
+      )}
+
+      <CustomAlertModal
         visible={modalVisible}
         onClose={() => setModalVisible(false)}
         image={Assets.icons.HighFive}
-        message='Congrats, your request is live!'
+        message="Congrats, your request is live!"
       />
       <Text style={styles.title}>
         Welcome, <Text style={styles.name}>{profile?.first_name}</Text>
@@ -106,6 +123,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#ffff",
+  },
+  progressBar: {
+    marginTop: 10,
   },
   bubble: {
     backgroundColor: Colors.grey.background,
@@ -164,6 +184,12 @@ const styles = StyleSheet.create({
   buttonText: {
     color: 'white',
 
+  },
+  progressText: {
+    textAlign: 'center',
+    fontSize: 18,
+    color: Colors.theme.accent,
+    fontFamily: 'LeagueSpartan-Light'
   },
 
 });

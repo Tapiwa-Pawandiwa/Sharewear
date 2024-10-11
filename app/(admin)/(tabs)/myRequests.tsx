@@ -13,6 +13,7 @@ import FilterChipList from "@/components/FilterChipList";
 import {Tables} from '@/app/database.types';
 import { useDonationRequestsByBeneficiary, useDonationsByRequest } from "@/app/hooks/useDonation";
 import { TouchableOpacity } from "react-native-gesture-handler";
+import { ActivityIndicator } from "react-native-paper";
 
 type DonationRequest = Tables<'donation_requests_with_categories_and_tags'>;
 
@@ -93,13 +94,22 @@ export default function TabTwoScreen() {
         </View>
       </View>
       <View  style={styles.listContainer}>
-         <FlatList
-          data={filteredRequests} // Now using filteredRequests instead of donationRequests
-          renderItem={renderItem}
-          keyExtractor={(item, index) => item.donation_request_id ? item.donation_request_id.toString() : `unidentified-${index}`}
-
-      />
-     
+      {loadingRequests ? (
+          // Display the loading indicator when requests are being fetched
+          <ActivityIndicator size="large" color={Colors.theme.primary}/>
+        ) : filteredRequests.length === 0 ? (
+          // Show "Nothing right now" message if there are no donations
+          <View style={styles.emptyContainer}>
+            <Text style={styles.emptyText}>Nothing right now</Text>
+          </View> 
+        )
+        :(
+          <FlatList
+            data={filteredRequests} // Now using filteredRequests instead of donationRequests
+            renderItem={renderItem}
+            keyExtractor={(item, index) => item.donation_request_id ? item.donation_request_id.toString() : `unidentified-${index}`}
+          />
+        )}
       </View>
       {selectedRequest && (
           <DonationRequestModal
@@ -153,5 +163,13 @@ const styles = StyleSheet.create({
   },
   listContainer:{
     flex: 1,
-  }
+  },emptyContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  emptyText: {
+    fontSize: 20,
+    color: Colors.grey.dark,
+  },
 });

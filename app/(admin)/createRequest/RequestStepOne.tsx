@@ -7,13 +7,13 @@ import { Link } from "expo-router";
 import StepCounter from "@/components/StepCounter";
 import Colors from "@/constants/Colors";
 import { AntDesign } from '@expo/vector-icons';
+import { Keyboard } from "react-native";
 import TagSelector from "@/components/TagSelectors";
 import { TextInput } from "react-native";
 import { useFormContext } from "@/app/providers/Form";
 import CustomRadioButton from "@/components/CustomRadioButton";
 import { supabase } from "@/lib/supabase";
 import {GooglePlacesAutocomplete} from 'react-native-google-places-autocomplete';
-import * as SecureStore from 'expo-secure-store';
 
 
 const RequestStepOne: React.FC = () => {
@@ -26,24 +26,24 @@ const RequestStepOne: React.FC = () => {
  
 
 
-  useEffect(() => {    
-    clearFormData();
-  }
-  ,[])
-
+  // Update formData whenever headline changes
   useEffect(() => {
     updateFormData('headline', headline);
+  }, [headline]);
+
+  const handleChangeText = (text: string) => {
+    setHeadline(text);
+  };
+
+  useEffect(() => {
     updateFormData('latitude', locationInfo.latitude);
     updateFormData('longitude', locationInfo.longitude);
     updateFormData('place_id', locationInfo.place_id);
     updateFormData('main_location', locationInfo.main_text);
     updateFormData('secondary_location', locationInfo.secondary_text);
     updateFormData('formatted_address', locationInfo.formatted_address);
-  }, [headline,locationInfo]);
+  }, [locationInfo]);
 
-  const handleChangeText = useCallback((text: string) => {
-    setHeadline(text);
-  }, []);
 
 
   const renderContent = () => {
@@ -55,11 +55,12 @@ const RequestStepOne: React.FC = () => {
 
         <Text style={styles.heading}>What is your request Headline?</Text>
         <TextInput
-          style={styles.input}
-          onChangeText={handleChangeText}
-          value={formData.headline}
-          placeholder="Help me with.."
-        />
+        style={styles.input}
+        onChangeText={handleChangeText}
+        value={headline}
+        placeholder="Help me with.."
+        autoCorrect={false}
+      />
         <Text style={styles.heading}>Select the pickup location for your request</Text>
       <View style={styles.googleContainer}>
       <GooglePlacesAutocomplete
@@ -72,10 +73,13 @@ const RequestStepOne: React.FC = () => {
       borderRadius: 25,
       borderWidth: 2,
       borderColor: 'grey',
-      height: 42,
+    
     },
   }}
   onPress={(data, details = null) => {
+    // Dismiss the keyboard before handling the selection
+    Keyboard.dismiss();
+
     if (details) {
       setLocationInfo({
         place_id: details.place_id,
@@ -89,8 +93,9 @@ const RequestStepOne: React.FC = () => {
   }}
   onFail={error => console.log(error)}
   onNotFound={() => console.log('no results')}
+keyboardShouldPersistTaps="handled"
   listEmptyComponent={(
-    <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+    <View style={{ alignItems: 'center', justifyContent: 'center'}}>
       <Text>No results were found</Text>
     </View>
   )}

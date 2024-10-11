@@ -56,61 +56,58 @@ const RequestStepThree:React.FC = () => {
   };
   
   const handlePublish = async () => {
-    console.log('Starting handlePublish, images:', formData.images);
-
     if (localImages.length === 0) {
       Alert.alert('Error', 'Please upload at least one image before publishing.');
       return;
     }
-    setIsUploading(true);
-    setModalVisible(true);
   
-    try{
-    
+    setIsUploading(true);
+    try {
+      // Navigate to the home page immediately with parameters to show progress and modal
+      router.push({
+        pathname: '/(tabs)',
+        params: {
+          showModal: 'true',    // Display the success modal on the home screen
+          showProgress: 'true', // Show the horizontal progress bar
+        },
+      });
+  
       let currentProgress = 0;
       const interval = setInterval(() => {
-          currentProgress += 0.2;
-          setProgress(currentProgress);
-          if (currentProgress >= 1) clearInterval(interval);
-      }, 400);
-
+        currentProgress += 0.1;
+        setProgress(currentProgress);
+        if (currentProgress >= 1) clearInterval(interval);
+      }, 1000);
+  
       const uploadedFilePaths = await uploadImages(localImages);
-
+  
       if (uploadedFilePaths.length === 0) {
         Alert.alert('Error', 'There was an error uploading your images. Please try again.');
         return;
-      }  
-    
+      }
+  
       const updatedFormData = {
         ...formData,
         images: [...formData.images, ...uploadedFilePaths],
-        status: Status.AVAILABLE,
+        status: Status.AVAILABLE, // Use Status enum
       };
   
-      // Post the updated form data
       const result = await postFormData(updatedFormData);
-
       if (result.success) {
-        setModalVisible(false);
-        router.push({
-          pathname: '/(tabs)',
-          params: {
-            showModal: 'true', // pass a parameter to show the modal
-          },
-        });
+        setProgress(1); // Update progress to 100% upon success
+        setIsUploading(false);
       } else {
         Alert.alert('Error', 'There was an error posting your request. Please try again later.');
       }
-    }catch (error) {
+    } catch (error) {
       console.error('Error posting form data:', error);
       Alert.alert('Error', 'There was an error uploading your images or posting your request. Please try again.');
     } finally {
       setIsUploading(false);
-      setModalVisible(true);
-      
-  }
-  
-  }
+    }
+  };
+
+
   return (
     <View style={styles.container}>
     <Image style={styles.headBox} source={require("../../../assets/images/birdbox.png")}/>

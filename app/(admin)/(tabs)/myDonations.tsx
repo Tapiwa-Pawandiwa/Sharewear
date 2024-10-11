@@ -25,6 +25,7 @@ import {
 } from "@/app/hooks/useDonation";
 import DonationCard from "@/components/user/DonationCard";
 import { useDonorContext } from "@/app/providers/Donor";
+import { ActivityIndicator } from "react-native-paper";
 
 type DonationRequest = Tables<"donationRequest">;
 type DonationWithDetails = Tables<"donation_with_details">;
@@ -150,13 +151,24 @@ export default function myDonations() {
         </View>
       </View>
       <View style={styles.listContainer}>
-        <FlatList
-          data={filteredDonations}
-          renderItem={renderItem}
-          keyExtractor={(item) => `${item.donation_id}`}
-          contentContainerStyle={{ paddingBottom: 100 }}
-          showsVerticalScrollIndicator={true}
-        />
+      {loadingDonations ? (
+          // Show loading indicator when donations are being fetched
+          <ActivityIndicator size="large" color={Colors.theme.primary} />
+        ) : filteredDonations.length === 0 ? (
+          // Show "Nothing right now" message if there are no donations
+          <View style={styles.emptyContainer}>
+            <Text style={styles.emptyText}>Nothing right now</Text>
+          </View>
+        ) : (
+          // Render the FlatList if there are donations
+          <FlatList
+            data={filteredDonations}
+            renderItem={renderItem}
+            keyExtractor={(item) => `${item.donation_id}`}
+            contentContainerStyle={{ paddingBottom: 100 }}
+            showsVerticalScrollIndicator={true}
+          />
+        )}
       </View>
       {selectedDonation && (
         <DonationModal
@@ -185,6 +197,7 @@ const styles = StyleSheet.create({
     marginLeft: 80,
     marginTop: -20,
   },
+  
   headerContainer: {
     height: 140,
     borderRadius: 40,
@@ -213,5 +226,13 @@ const styles = StyleSheet.create({
   listContainer: {
     flex: 1,
     height: "100%",
+  },emptyContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  emptyText: {
+    fontSize: 20,
+    color: Colors.grey.dark,
   },
 });
