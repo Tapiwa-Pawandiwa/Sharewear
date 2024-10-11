@@ -52,18 +52,18 @@ const styles = StyleSheet.create({
   radioButtonContainer: {
     flexDirection: "row",
     alignItems: "center",
-    marginVertical: 8,
+    marginVertical: 10,
     borderRadius: 8,
     marginHorizontal: 10
   },
   radioButton: {
     marginRight: 10,
     borderRadius: 15,
-    borderWidth: 2,
+    borderWidth: 1,
     borderColor: "black",
     alignItems: "center",
     justifyContent: "center",
-    height: 25,
-    width: 25,
+    height: 30,
+    width: 30,
   },
 });

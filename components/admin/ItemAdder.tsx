@@ -185,12 +185,14 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   input: {
-    height: 40,
+    height: 50,
     margin: 12,
-    borderWidth: 1,
+    backgroundColor: Colors.grey.alt,
+
     padding: 10,
     borderRadius: 25,
-    width: 220,
+    width: 350,
+    
     alignSelf: "center",
     color: "black",
   },

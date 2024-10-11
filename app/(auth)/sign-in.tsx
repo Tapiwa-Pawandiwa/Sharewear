@@ -94,13 +94,7 @@ const signInScreen = () => {
         style={styles.image}
       />
       <Text style={styles.title}>Welcome</Text>
-      <View
-        style={{
-          borderBottomColor: "black",
-          borderBottomWidth: StyleSheet.hairlineWidth,
-          width: 300,
-        }}
-      ></View>
+   
 
       <TextInput
         style={[
@@ -200,13 +194,13 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   input: {
-    height: 40,
-    width: 300,
+    height: 50,
+    width: 355,
     margin: 12,
-    borderWidth: 1,
+
     padding: 10,
     backgroundColor: Colors.grey.alt,
-    borderRadius: 10,
+    borderRadius: 20,
     borderColor: "black",
   },
   textLink: {
@@ -223,7 +217,7 @@ const styles = StyleSheet.create({
   icon: {
     position: "absolute",
     right: 20,
-    top: 20,
+    top: 25,
   },
   resetText: {
     color: Colors.green.main,

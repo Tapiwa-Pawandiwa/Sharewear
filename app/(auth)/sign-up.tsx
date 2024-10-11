@@ -1,5 +1,5 @@
 import { View } from "@/components/Themed";
-import { Text, StyleSheet, TextInput, Image, Alert } from "react-native";
+import { Text, StyleSheet, TextInput, Image, Alert, ScrollView, Platform, KeyboardAvoidingView } from "react-native";
 import React, { useState } from "react";
 import { Link, router } from "expo-router";
 import Colors from "@/constants/Colors";
@@ -10,7 +10,6 @@ import { RadioButton } from "react-native-paper";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "../providers/Auth";
 
-
 const signUpScreen = () => {
   const [email, setEmail] = useState("");
   const [firstName, setFirstName] = useState(""); // [value, setValue
@@ -19,7 +18,7 @@ const signUpScreen = () => {
   const [userType, setUserType] = useState("Donor");
   const [phone, setPhone] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const {isAdmin} = useAuth();
+  const { isAdmin } = useAuth();
 
   const [loading, setLoading] = useState(false);
 
@@ -39,26 +38,24 @@ const signUpScreen = () => {
       return;
     }
     try {
-      console.log('signing up ...')
+      console.log("signing up ...");
       setLoading(true);
-      const { data, error } = await supabase.auth.signUp(
-        {
-          email: email,
-          password: password,
-          options: {
-            data: {
-              first_name: firstName,
-              last_name: lastName,
-              user_type: userType,
-              username: email,
-              phone_number: phone,
-            }
-          }
-        }
-      )
-      console.log(data, 'data');
-      if(error){
-        console.log(error,'error signing up')
+      const { data, error } = await supabase.auth.signUp({
+        email: email,
+        password: password,
+        options: {
+          data: {
+            first_name: firstName,
+            last_name: lastName,
+            user_type: userType,
+            username: email,
+            phone_number: phone,
+          },
+        },
+      });
+      console.log(data, "data");
+      if (error) {
+        console.log(error, "error signing up");
         throw error;
       }
       //auto sign in after sign up
@@ -66,17 +63,16 @@ const signUpScreen = () => {
         email: email,
         password: password,
       });
-      console.log(newData, 'newData');
-      
-      if (newData.user?.user_metadata.user_type === "Beneficiary"){
+      console.log(newData, "newData");
+
+      if (newData.user?.user_metadata.user_type === "Beneficiary") {
         router.push("/(admin)");
-      }else {
+      } else {
         router.push("/(user)");
       }
-   
     } catch (e: any) {
       console.log("Sign up failed", e);
-     // setError(e.message);
+      // setError(e.message);
       Alert.alert("Sign up failed, try again", e.message);
     }
   };
@@ -93,13 +89,15 @@ const signUpScreen = () => {
   //need to differentiate between donor and beneficiary
   // so i need to use the userType in custom attributes to split the UI that way and route it bassed on the userType
   return (
-    <View style={styles.container}>
+    <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === "ios" ? "padding" : "height"}>
+    <ScrollView contentContainerStyle={styles.scrollContainer} showsVerticalScrollIndicator={false}>
       <Image
         source={require("../../assets/images/logos/main-logo.png")}
         style={styles.image}
+        resizeMode="contain"
       />
       <Text style={styles.headingText}>Let's get started</Text>
-      <Text style={styles.title}>Create an Account Purpose: </Text>
+      <Text style={styles.title}>Create an Account Purpose:</Text>
       <View style={styles.radioButtonContainer}>
         <CustomRadioButton
           label="Donor"
@@ -131,7 +129,7 @@ const signUpScreen = () => {
         onChangeText={setEmail}
         value={email}
       />
-        <TextInput
+      <TextInput
         style={styles.input}
         autoCapitalize="none"
         keyboardType="phone-pad"
@@ -156,36 +154,35 @@ const signUpScreen = () => {
         />
       </View>
       <View style={styles.passwordContainer}>
-      <TextInput
-        style={styles.input}
-        placeholder="Confirm Password"
-        value={confirmPassword}
-        secureTextEntry={!showPassword}
-        onChangeText={setConfirmPassword}
-      />  
-      <MaterialCommunityIcons
-      name={showPassword ? "eye-off" : "eye"}
-      size={24}
-      color="#aaa"
-      style={styles.icon}
-      onPress={toggleShowPassword}
-    />
+        <TextInput
+          style={styles.input}
+          placeholder="Confirm Password"
+          value={confirmPassword}
+          secureTextEntry={!showPassword}
+          onChangeText={setConfirmPassword}
+        />
+        <MaterialCommunityIcons
+          name={showPassword ? "eye-off" : "eye"}
+          size={24}
+          color="#aaa"
+          style={styles.icon}
+          onPress={toggleShowPassword}
+        />
       </View>
-      
       <Text style={styles.titleText}>
         Already have an account?
         <Link href="/(auth)/sign-in">
           <Text style={styles.resetText}> Sign In</Text>
         </Link>
       </Text>
-
       <RoundedButton
         title="Sign Up"
         onPress={signUpwithEmail}
         buttonStyle={styles.button}
         textStyle={styles.buttonText}
       />
-    </View>
+    </ScrollView>
+  </KeyboardAvoidingView>
   );
 };
 
@@ -194,8 +191,13 @@ export default signUpScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: "#fff",
+  },
+  scrollContainer: {
+    flexGrow: 1,
     justifyContent: "center",
     alignItems: "center",
+    paddingVertical: 20,
   },
   title: {
     fontSize: 20,
@@ -203,75 +205,48 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   input: {
-    height: 40,
-    width: 300,
-    margin: 12,
-    borderWidth: 1,
-    padding: 10,
-    backgroundColor: "white",
-    borderRadius: 10,
-    borderColor: "black",
+    height: 50,
+    width: 350,
+    marginVertical: 10,
+    padding: 15,
+    backgroundColor: Colors.grey.alt,
+    borderRadius: 25,
   },
   passwordContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
+    position: "relative",
+    width: 350,
   },
-  titleText:{
+  titleText: {
     fontSize: 16,
     color: Colors.theme.secondary,
-    marginTop: 20,
+    marginTop: 5,
   },
   icon: {
     position: "absolute",
-    right: 20,
-    top: 20,
+    right: 10,
+    top: 12,
   },
   button: {
     backgroundColor: Colors.green.main,
-    marginTop: 20,
+    marginTop: 10,
   },
   buttonText: {
     color: "white",
   },
   image: {
-    width: 250,
-    height: 115,
+    width: 150,
+    height: 150,
+    marginTop: 10,
   },
-  headingText:{
+  headingText: {
     fontSize: 24,
     fontWeight: "bold",
-    color: Colors.theme.tertiary
+    color: Colors.theme.tertiary,
+    marginBottom: 5,
   },
   resetText: {
     color: Colors.green.main,
     fontSize: 16,
-  },
-  radioGroup: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-around",
-    marginTop: 20,
-    borderRadius: 8,
-    backgroundColor: "white",
-    padding: 16,
-    elevation: 4,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-  },
-  radioButton: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  radioLabel: {
-    marginLeft: 8,
-    fontSize: 16,
-    color: "#333",
   },
   radioButtonContainer: {
     padding: 10,

@@ -64,15 +64,15 @@ const RequestStepOne: React.FC = () => {
         <Text style={styles.heading}>Select the pickup location for your request</Text>
       <View style={styles.googleContainer}>
       <GooglePlacesAutocomplete
-  placeholder='Drop off location'
+  placeholder='Pickup location for items'
   query={{key:'AIzaSyA11amKpXti4LiFqwOidmgQ8FmJDaARqVM'}}
   fetchDetails={true}
   styles={{
     textInput:{
       fontSize: 14,
       borderRadius: 25,
-      borderWidth: 2,
-      borderColor: 'grey',
+      backgroundColor: Colors.grey.alt,
+      width: 350,
     
     },
   }}
@@ -150,8 +150,8 @@ const styles = StyleSheet.create({
   },
 
   headBox:{
-    width: 100,
-    height: 100,
+    width: 50,
+    height: 50,
     alignSelf: 'center',
   },
   heading:{
@@ -164,10 +164,10 @@ const styles = StyleSheet.create({
   input: {
     height: 40,
     margin: 12,
-    borderWidth: 1,
+    backgroundColor: Colors.grey.alt,
     padding: 10,
     borderRadius: 25,
-    width: 300,
+    width: 350,
     alignSelf: 'center',
     marginBottom: 20,
   },

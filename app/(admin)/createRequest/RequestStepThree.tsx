@@ -224,9 +224,9 @@ const styles = StyleSheet.create({
   input :{
     height: 150,
     margin: 12,
-    width: 300,
+    width: 350,
     alignSelf: 'center',
-    borderWidth: 10,
+    borderWidth: 2,
     borderColor: Colors.grey.card,
     padding: 10,
     borderRadius: 20,
