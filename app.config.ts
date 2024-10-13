@@ -15,48 +15,50 @@ export default ({ config }: { config: any }) => {
       resizeMode: "center",
       backgroundColor: "#ffffff",
     },
-  
     ios: {
       supportsTablet: true,
       bundleIdentifier: "com.tapiwap.ShareWhere",
       config: {
         googleMapsApiKey: process.env.GOOGLE_MAPS_API_KEY, // Ensure this is correctly loaded
+      },
+      infoPlist: {
+        NSPhotoLibraryUsageDescription: "This app needs access to your photo library to allow you to upload photos for donation requests.",
+        NSCameraUsageDescription: "This app needs access to your camera to allow you to take pictures for donation requests.",
+        NSLocationWhenInUseUsageDescription: "This app uses your location to help you find donation locations nearby.",
+        NSPhotoLibraryAddUsageDescription: "This app requires access to save photos to your photo library.",
       }
     },
     android: {
+      package: "com.tapiwap.Sharewhere", // Make sure this is defined correctly
+      versionCode: 1, // Increment this for new builds
       adaptiveIcon: {
-        foregroundImage: "./assets/images/adaptive-icon.png",
-        backgroundColor: "#ffffff"
+        foregroundImage: "./assets/images/icon.png",
+        backgroundColor: "#ffffff",
       },
       config: {
         googleMaps: {
-          apiKey: process.env.GOOGLE_MAPS_API_KEY, // Ensure this is correctly loaded
-        }
-      }
+          apiKey: process.env.GOOGLE_MAPS_API_KEY, // Ensure this is defined correctly in your .env file
+        },
+      },
     },
     web: {
       bundler: "metro",
       output: "static",
-      favicon: "./assets/images/favicon.png"
+      favicon: "./assets/images/favicon.png",
     },
     plugins: [
-       "expo-font",
       "expo-router",
       "expo-secure-store",
     ],
     experiments: {
-      typedRoutes: true
+      typedRoutes: true,
     },
-    expo: {
-    "extra": {
-      "eas": {
-        "projectId": "a01b18dd-775f-4cfd-933f-252431637bef"
-      }
-    }
-  },
     extra: {
-      googleMapsApiKey: process.env.GOOGLE_MAPS_API_KEY, // Optional: if you need to reference it elsewhere
+      eas: {
+        projectId: "a01b18dd-775f-4cfd-933f-252431637bef",
+      },
+      googleMapsApiKey: process.env.GOOGLE_MAPS_API_KEY, // Ensure this key is set in your .env file
     },
-    "owner": "tapiwap",
-  }
+    owner: "tapiwap", // Ensure owner matches your Expo account
+  };
 };
