@@ -3,27 +3,29 @@ import { SafeAreaView, StyleSheet, Text, View ,Pressable,FlatList} from 'react-n
 import Chip from './Chip';
 import { supabase } from '@/lib/supabase';
 import { useFormContext } from '@/app/providers/Form';
+import { ActivityIndicator } from 'react-native-paper';
+import Colors from '@/constants/Colors';
 
 const TagSelector: React.FC = () => {
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const {formData, addTag, removeTag}= useFormContext();
-  
-  const [availableTags, setAvailableTags] = useState<{ id: number, name: string }[] | null>(null);
+  const [loading, setLoading] = useState(true); // Loading state
 
+  const [availableTags, setAvailableTags] = useState<{ id: number, name: string }[] | null>(null);
   useEffect(() => {
     const fetchTags = async () => {
+      setLoading(true); // Start loading
       let { data: tags, error } = await supabase
-      .from('tags')
-     .select('*')
-      
-     if (error) {
-       console.log('Error fetching tags', error.message);
-       return;
-     }else {
+        .from('tags')
+        .select('*');
+
+      if (error) {
+        console.log('Error fetching tags', error.message);
+      } else {
         setAvailableTags(tags);
-     }
+      }
+      setLoading(false); // Stop loading
     };
-   
 
     fetchTags();
   }, []);
@@ -36,7 +38,15 @@ const TagSelector: React.FC = () => {
     }
   };
 
-
+  if (loading) {
+    // Show activity indicator while loading
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color={Colors.theme.primary} />
+        <Text style={styles.loadingText}>Loading tags...</Text>
+      </View>
+    );
+  }
 return (
     <FlatList
         data={availableTags}
@@ -61,6 +71,15 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     marginBottom: 10,
+  },  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    marginTop: 10,
+    fontSize: 16,
+    color: '#666',
   },
   column: {
     justifyContent:'center',

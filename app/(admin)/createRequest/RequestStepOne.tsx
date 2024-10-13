@@ -1,5 +1,5 @@
 import React, { useState,useEffect,useCallback } from "react";
-import { View, Text, StyleSheet, Image, Pressable , FlatList, KeyboardAvoidingView, Platform} from "react-native";
+import { View, Text, StyleSheet, Image, Pressable , FlatList, KeyboardAvoidingView, Platform, Alert} from "react-native";
 import RoundedButton from "@/components/RoundedButton";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
@@ -14,6 +14,7 @@ import { useFormContext } from "@/app/providers/Form";
 import CustomRadioButton from "@/components/CustomRadioButton";
 import { supabase } from "@/lib/supabase";
 import {GooglePlacesAutocomplete} from 'react-native-google-places-autocomplete';
+import * as Location from "expo-location"; // Importing expo-location
 
 
 const RequestStepOne: React.FC = () => {
@@ -44,7 +45,19 @@ const RequestStepOne: React.FC = () => {
     updateFormData('formatted_address', locationInfo.formatted_address);
   }, [locationInfo]);
 
+  useEffect(() => {
+    const requestLocationPermission = async () => {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") {
+        Alert.alert(
+          "Permission Denied",
+          "Location permission is required to use this feature."
+        );
+      }
+    };
 
+    requestLocationPermission();
+  }, []);
 
   const renderContent = () => {
     return (
@@ -65,7 +78,7 @@ const RequestStepOne: React.FC = () => {
       <View style={styles.googleContainer}>
       <GooglePlacesAutocomplete
   placeholder='Pickup location for items'
-  query={{key:'AIzaSyA11amKpXti4LiFqwOidmgQ8FmJDaARqVM'}}
+  query={{key:'AIzaSyA11amKpXti4LiFqwOidmgQ8FmJDaARqVM',    language: 'en',}}
   fetchDetails={true}
   styles={{
     textInput:{
@@ -121,7 +134,7 @@ keyboardShouldPersistTaps="handled"
           data={[{ key: 'content' }]}
           renderItem={renderContent}
           keyExtractor={item => item.key}
-  
+          keyboardShouldPersistTaps="handled"
         />
       </KeyboardAvoidingView>
     </SafeAreaView>

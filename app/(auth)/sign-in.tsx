@@ -133,7 +133,7 @@ const signInScreen = () => {
       </View>
       <View style={{ flexDirection: "row" }}>
         <Text style={styles.loginSubtitle}>Don't have an account?</Text>
-        <Link href="/(auth)/sign-up">
+        <Link href="/(auth)/sign-up" style={styles.link}>
           <Text style={[styles.textLink, { color: Colors.green.main }]}>
             {" "}
             Sign Up
@@ -206,7 +206,10 @@ const styles = StyleSheet.create({
   textLink: {
     color: Colors.green.main,
     fontSize: 16,
-    fontFamily: "Helvetica",
+    fontFamily: "Inter-Regular",
+  },
+  link:{
+    marginTop: 2,
   },
   passwordContainer: {
     flexDirection: "row",
