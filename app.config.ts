@@ -6,7 +6,7 @@ export default ({ config }: { config: any }) => {
     name: "ShareWhere",
     displayName: "ShareWhere",
     slug: "sharewhere",
-    version: "1.0.0",
+    version: "1.0.1",
     orientation: "portrait",
     icon: "./assets/images/icon.png",
     scheme: "sharewhere",

@@ -93,7 +93,7 @@ function RootLayout() {
   useEffect(() => {
     console.log("Loaded:", loaded, "App Ready:", isAppReady, "Initial Route:", initialRoute);
     if (isAppReady && initialRoute) {
-      router.replace(initialRoute);
+      router.replace(initialRoute as any);
     }
   }, [isAppReady, initialRoute]);
 
@@ -145,7 +145,6 @@ function RootLayoutNav() {
   const queryClient = new QueryClient();
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
         <AuthProvider>
           <QueryClientProvider client={queryClient}>
             <FormProvider>
@@ -169,7 +168,6 @@ function RootLayoutNav() {
             </FormProvider>
           </QueryClientProvider>
         </AuthProvider>
-      </ThemeProvider>
     </GestureHandlerRootView>
   );
 }
