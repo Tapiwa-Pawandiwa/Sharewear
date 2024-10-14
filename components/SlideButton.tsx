@@ -1,7 +1,6 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useImperativeHandle } from 'react';
 import { View, Text, Animated, StyleSheet } from 'react-native';
 import { PanGestureHandler, State } from 'react-native-gesture-handler';
-
 import { Ionicons } from '@expo/vector-icons';
 import Colors from '@/constants/Colors';
 
@@ -13,9 +12,18 @@ interface SlideButtonProps {
   disabled?: boolean;
 }
 
-const SlideButton: React.FC<SlideButtonProps> = ({ title, onSlideComplete, buttonStyle, textStyle, disabled }) => {
+const SlideButton = React.forwardRef(({ title, onSlideComplete, buttonStyle, textStyle, disabled }: SlideButtonProps, ref) => {
   const [slideComplete, setSlideComplete] = useState(false);
   const slideAnim = useRef(new Animated.Value(0)).current;
+
+  useImperativeHandle(ref, () => ({
+    reset: () => {
+      Animated.spring(slideAnim, {
+        toValue: 0,
+        useNativeDriver: false,
+      }).start(() => setSlideComplete(false));
+    },
+  }));
 
   const handleGestureEvent = Animated.event(
     [{ nativeEvent: { translationX: slideAnim } }],
@@ -26,7 +34,9 @@ const SlideButton: React.FC<SlideButtonProps> = ({ title, onSlideComplete, butto
     if (event.nativeEvent.state === State.END) {
       if (event.nativeEvent.translationX > 150) {
         setSlideComplete(true);
-       {disabled ? undefined : onSlideComplete()} 
+        if (!disabled) {
+          onSlideComplete();
+        }
       } else {
         // Reset the animation if the slide wasn't far enough
         Animated.spring(slideAnim, {
@@ -37,29 +47,27 @@ const SlideButton: React.FC<SlideButtonProps> = ({ title, onSlideComplete, butto
     }
   };
 
-
   return (
     <View style={[styles.button, buttonStyle]}>
-       <PanGestureHandler
+      <PanGestureHandler
         onGestureEvent={handleGestureEvent}
         onHandlerStateChange={handleGestureStateChange}
         enabled={!disabled}
       >
- <Animated.View style={[styles.buttonContent, { transform: [{ translateX: slideAnim }] }]}>
+        <Animated.View style={[styles.buttonContent, { transform: [{ translateX: slideAnim }] }]}>
           <Ionicons name="arrow-forward-circle" size={24} color="white" style={styles.icon} />
           {!slideComplete && <Text style={[styles.buttonText, textStyle]}>{title}</Text>}
         </Animated.View>
       </PanGestureHandler>
-     
     </View>
   );
-};
+});
 
 const styles = StyleSheet.create({
   button: {
     width: 250,
     borderRadius: 25,
-    backgroundColor: Colors.theme.primary,
+    backgroundColor: Colors.green.main,
     overflow: 'hidden',
     marginVertical: 20,
     height: 50,
@@ -74,17 +82,12 @@ const styles = StyleSheet.create({
   buttonText: {
     color: 'white',
     fontSize: 18,
+    alignSelf: 'center',
+    textAlign: 'center',
     marginLeft: 10,
   },
   icon: {
     marginRight: 10,
-  },
-  overlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
   },
 });
 

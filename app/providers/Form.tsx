@@ -9,11 +9,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "./Auth";
 import { decode } from "base64-arraybuffer";
-import { Alert } from "react-native";
-import { Redirect } from "expo-router";
-import { Database } from "../database.types";
-import { CustomAlertModal } from "@/components/CustomAlertModal";
-import Images from '../../assets/Assets';
+
 
 export interface Item {
   id: number;

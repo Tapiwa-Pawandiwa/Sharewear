@@ -4,6 +4,7 @@ export default ({ config }: { config: any }) => {
   return {
     ...config,
     name: "ShareWhere",
+    displayName: "ShareWhere",
     slug: "sharewhere",
     version: "1.0.0",
     orientation: "portrait",

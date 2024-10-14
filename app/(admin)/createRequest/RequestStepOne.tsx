@@ -65,7 +65,6 @@ const RequestStepOne: React.FC = () => {
         <Image style={styles.headBox} source={require("../../../assets/images/birdbox.png")} />
         <Text style={styles.header}>Request Form</Text>
         <StepCounter currentStep={1} totalSteps={3} />
-
         <Text style={styles.heading}>What is your request Headline?</Text>
         <TextInput
         style={styles.input}

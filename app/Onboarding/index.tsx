@@ -16,7 +16,7 @@ const slides = [
   {
     id: 2,
     title: "As a beneficiary",
-    description: "Simply create a request by filling in a form, Sharewear ensures donations are made in a timely manner",
+    description: "Simply create a request by filling in a form, ShareWhere ensures donations are made in a timely manner",
     image: require("../../assets/images/fillform.png"),
   },
   {

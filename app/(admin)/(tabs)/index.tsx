@@ -23,8 +23,6 @@ export default function TabOneScreen() {
   const [progress, setProgress] = useState(0); // Progress state
   const params = useLocalSearchParams();
 
-
- 
   useEffect(() => {
     if (params.showModal === 'true') {
       setModalVisible(true);
@@ -103,17 +101,6 @@ export default function TabOneScreen() {
 
         }
    
-        {/*
-        <CustomAlertModal
-                visible={modalVisible}
-                loading={isUploading}
-
-                progress={progress}
-                message='Uploading images and posting request...'
-                onClose={() => setModalVisible(false)} // Pass the progress value to the modal
-        />
-*/}
-      
       </View>
     </SafeAreaView>
   );
