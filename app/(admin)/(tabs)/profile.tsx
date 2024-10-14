@@ -14,11 +14,14 @@ const profile = () => {
       <View style={styles.avatarContainer}>
         <View style={styles.avatar}>
         </View>
+ 
       </View>
+ 
       <Text style={styles.name}>{profile?.first_name}</Text>
+      <Text style={styles.type}>{profile?.user_type}</Text>
       <View style={styles.detailsContainer}>
         <Text>My Info</Text>
-        <Text>{profile?.user_type}</Text>
+  
         <Text>Contact Details:</Text>
         <Text>+27874567865</Text>
       </View>
@@ -42,6 +45,12 @@ const styles = StyleSheet.create({
     marginHorizontal: 20,
     marginTop: 20,
     height: 200,
+  },
+  type:{
+    alignSelf: "center",
+    fontSize: 18,
+    fontFamily: "LeagueSpartan-Regular",
+
   },
   avatar: {
     width: 150,
@@ -79,7 +88,7 @@ const styles = StyleSheet.create({
     color: "#ffff",
   },
   logoutButton:{
-    backgroundColor: Colors.red.hard,
+    backgroundColor: Colors.theme.tertiary,
     width: 150,
     alignSelf: "center",
     marginTop: 20,
